@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<title>Me — Profile</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#031215;
+  --bg-1:#061c21;
+  --panel:#0a272d;
+  --panel-2:#0d3037;
+  --gold-1:#fff8dc;
+  --gold-2:#f4dc8a;
+  --gold-3:#d4af37;
+  --gold-4:#9c7418;
+  --gold-grad:linear-gradient(115deg,#fff8dc 0%,#f4dc8a 16%,#d4af37 34%,#8a6318 50%,#d4af37 66%,#f7e79c 84%,#fff8dc 100%);
+  --teal:#20e3b2;
+  --cyan:#00E5FF;
+  --pink:#ff2a85;
+  --purple:#a855f7;
+  --text:#eaf6f6;
+  --muted:#7fa3a6;
+  --border:rgba(212,175,55,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+input,textarea{user-select:text;-webkit-user-select:text}
+
+body{
+  font-family:'Plus Jakarta Sans','Outfit',system-ui,sans-serif;
+  background:#031215;
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* ══════ AURORA BACKGROUND ══════ */
+.bg-aurora{
+  position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+}
+.bg-aurora span{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;}
+.bg-aurora span:nth-child(1){
+  width:400px;height:400px;background:radial-gradient(circle,#20e3b2,#0891b2 55%,transparent 78%);
+  top:-160px;left:-120px;animation:float1 18s ease-in-out infinite;
+}
+.bg-aurora span:nth-child(2){
+  width:360px;height:360px;background:radial-gradient(circle,#f4dc8a,#d4af37 55%,transparent 78%);
+  top:-100px;right:-140px;animation:float2 21s ease-in-out infinite;
+}
+.bg-aurora span:nth-child(3){
+  width:380px;height:380px;background:radial-gradient(circle,#a855f7,#6366f1 55%,transparent 78%);
+  bottom:-160px;left:-130px;animation:float3 24s ease-in-out infinite;opacity:.35;
+}
+.bg-aurora span:nth-child(4){
+  width:340px;height:340px;background:radial-gradient(circle,#ff2a85,#a855f7 55%,transparent 78%);
+  bottom:-140px;right:-140px;animation:float4 20s ease-in-out infinite;opacity:.35;
+}
+@keyframes float1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(70px,60px) scale(1.15)}}
+@keyframes float2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-80px,70px) scale(1.1)}}
+@keyframes float3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(90px,-60px) scale(1.12)}}
+@keyframes float4{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-70px,-80px) scale(1.18)}}
+
+/* ══════ STARS ══════ */
+.stars{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20px 30px,#fff,transparent),
+    radial-gradient(1px 1px at 140px 90px,#a5f3fc,transparent),
+    radial-gradient(1px 1px at 220px 170px,#fbbf24,transparent),
+    radial-gradient(1.5px 1.5px at 320px 60px,#fff,transparent),
+    radial-gradient(1px 1px at 90px 240px,#67e8f9,transparent),
+    radial-gradient(1px 1px at 380px 260px,#fff,transparent),
+    radial-gradient(1px 1px at 260px 300px,#fda4af,transparent);
+  background-size:520px 420px;
+  animation:twinkle 3.5s ease-in-out infinite alternate;
+  opacity:.7;
+}
+@keyframes twinkle{0%{opacity:.4}100%{opacity:.95}}
+
+/* ══════ LOADING COVER ══════ */
+.loading-cover{
+  position:fixed;inset:0;z-index:9999;
+  background:radial-gradient(circle at 50% 40%,#0a272d,#031215);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  padding:24px;transition:opacity .3s;
+}
+.loading-cover.hidden{opacity:0;pointer-events:none}
+.spinner{
+  width:56px;height:56px;border:3px solid rgba(32,227,178,.2);
+  border-top-color:var(--teal);border-right-color:var(--gold-3);
+  border-radius:50%;animation:spin .9s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:14px;color:var(--teal);font-weight:600;letter-spacing:.5px}
+
+/* ══════ MAIN CONTAINER ══════ */
+.app-container{
+  width:100%;max-width:430px;min-height:100vh;position:relative;z-index:2;
+  background:
+    radial-gradient(600px 320px at 50% -5%,rgba(32,227,178,.10),transparent 65%),
+    radial-gradient(500px 400px at 100% 40%,rgba(212,175,55,.06),transparent 60%),
+    linear-gradient(180deg,rgba(6,28,33,.85) 0%,rgba(4,22,26,.95) 55%,rgba(3,17,20,.98) 100%);
+  box-shadow:0 0 80px rgba(0,0,0,.8);
+  padding-bottom:40px;
+  overflow:hidden;
+}
+.app-container::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(212,175,55,.18),transparent 30%,transparent 75%,rgba(212,175,55,.12));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  padding:1px;pointer-events:none;z-index:5;
+}
+
+/* ══════ TOP BAR ══════ */
+.top-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:20px 20px 8px;position:relative;z-index:6;
+}
+.back-btn{
+  width:42px;height:42px;border-radius:14px;
+  background:linear-gradient(160deg,rgba(32,227,178,.12),rgba(212,175,55,.06));
+  border:1px solid rgba(32,227,178,.3);
+  display:grid;place-items:center;
+  color:var(--teal);font-size:16px;cursor:pointer;transition:.25s;
+}
+.back-btn:active{transform:scale(.92)}
+.page-title{
+  font-family:'Orbitron',sans-serif;font-size:18px;font-weight:800;
+  letter-spacing:.15em;
+  background:var(--gold-grad);background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:goldShift 6s ease infinite;
+}
+@keyframes goldShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.settings-btn{
+  width:42px;height:42px;border-radius:14px;
+  background:linear-gradient(160deg,rgba(212,175,55,.15),rgba(32,227,178,.05));
+  border:1px solid var(--border);
+  display:grid;place-items:center;
+  color:var(--gold-2);font-size:16px;cursor:pointer;transition:.25s;
+}
+.settings-btn:active{transform:scale(.92)}
+
+/* ══════ PROFILE HEADER ══════ */
+.profile-header{
+  display:flex;flex-direction:column;align-items:center;
+  padding:20px 20px 12px;position:relative;z-index:6;
+}
+.avatar-wrap{
+  position:relative;width:110px;height:110px;cursor:pointer;
+  margin-bottom:14px;
+}
+.avatar-ring{
+  position:absolute;inset:-6px;border-radius:50%;
+  background:conic-gradient(from 0deg,#20e3b2,#00E5FF,#a855f7,#ff2a85,#f4dc8a,#d4af37,#20e3b2);
+  animation:rotateRing 6s linear infinite;
+  filter:blur(2px);
+}
+@keyframes rotateRing{to{transform:rotate(360deg)}}
+.avatar-inner{
+  position:absolute;inset:0;border-radius:50%;overflow:hidden;
+  background:#061c21;
+  border:3px solid #031215;
+  box-shadow:0 0 30px rgba(32,227,178,.5),inset 0 0 20px rgba(0,0,0,.7);
+}
+.avatar-inner img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar-cam{
+  position:absolute;bottom:2px;right:2px;
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,#20e3b2,#00E5FF);
+  display:grid;place-items:center;
+  color:#031215;font-size:13px;font-weight:800;
+  border:3px solid #031215;
+  box-shadow:0 4px 14px rgba(32,227,178,.5);
+  z-index:3;
+}
+.avatar-pulse{
+  position:absolute;inset:-14px;border-radius:50%;
+  border:2px solid rgba(32,227,178,.35);
+  animation:haloPulse 2.4s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes haloPulse{0%{transform:scale(.96);opacity:.7}50%{transform:scale(1.04);opacity:.2}100%{transform:scale(.96);opacity:.7}}
+
+.user-name-row{
+  display:flex;align-items:center;gap:8px;margin-bottom:6px;
+}
+.user-name{
+  font-size:22px;font-weight:800;color:#fff;
+  letter-spacing:.02em;
+  text-shadow:0 0 20px rgba(32,227,178,.3);
+  max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.edit-name-btn{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(32,227,178,.12);
+  border:1px solid rgba(32,227,178,.35);
+  color:var(--teal);font-size:12px;cursor:pointer;
+  display:grid;place-items:center;transition:.25s;
+}
+.edit-name-btn:active{transform:scale(.9)}
+
+.user-uid-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 14px;border-radius:999px;
+  background:linear-gradient(135deg,rgba(32,227,178,.15),rgba(212,175,55,.08));
+  border:1px solid rgba(32,227,178,.35);
+  font-family:'Orbitron',sans-serif;
+  font-size:11.5px;font-weight:700;letter-spacing:.08em;
+  color:var(--teal);
+  box-shadow:0 0 14px rgba(32,227,178,.2);
+  margin-bottom:4px;
+}
+.user-uid-pill i{font-size:10px}
+
+/* ══════ STATS ══════ */
+.stats-row{
+  display:flex;justify-content:center;gap:14px;
+  padding:14px 20px 20px;
+}
+.stat-box{
+  min-width:90px;padding:10px 16px;border-radius:16px;
+  background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+  border:1px solid var(--border);
+  text-align:center;cursor:pointer;transition:.25s;
+  backdrop-filter:blur(10px);
+}
+.stat-box:active{transform:scale(.95);background:rgba(212,175,55,.1)}
+.stat-num{
+  font-family:'Orbitron',sans-serif;
+  font-size:20px;font-weight:800;
+  background:var(--gold-grad);background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;margin-bottom:4px;
+  animation:goldShift 6s ease infinite;
+}
+.stat-lbl{
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;
+}
+
+/* ══════ DIAMOND CARD ══════ */
+.diamond-card{
+  margin:0 20px 16px;padding:16px 20px;border-radius:20px;
+  background:
+    radial-gradient(200px 100px at 0% 0%,rgba(32,227,178,.2),transparent 70%),
+    radial-gradient(200px 100px at 100% 100%,rgba(0,229,255,.15),transparent 70%),
+    linear-gradient(135deg,#0c2f35 0%,#071e23 100%);
+  border:1px solid rgba(32,227,178,.35);
+  box-shadow:0 12px 30px rgba(0,0,0,.5),0 0 24px rgba(32,227,178,.15);
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;overflow:hidden;
+}
+.diamond-card::before{
+  content:"";position:absolute;top:0;left:-40%;width:40%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.15),transparent);
+  transform:skewX(-20deg);animation:diamondSweep 4s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes diamondSweep{0%{left:-40%}55%{left:140%}100%{left:140%}}
+.dc-left{display:flex;align-items:center;gap:12px;position:relative;z-index:2}
+.dc-icon{
+  width:44px;height:44px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(0,229,255,.25),rgba(32,227,178,.15));
+  border:1px solid rgba(0,229,255,.5);
+  display:grid;place-items:center;font-size:20px;
+  box-shadow:0 0 18px rgba(0,229,255,.4);
+  animation:gemGlow 2.4s ease-in-out infinite alternate;
+}
+@keyframes gemGlow{from{box-shadow:0 0 12px rgba(0,229,255,.3)}to{box-shadow:0 0 24px rgba(0,229,255,.6)}}
+.dc-info{display:flex;flex-direction:column;gap:2px}
+.dc-lbl{font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(190,205,230,.7);font-weight:700}
+.dc-val{
+  font-family:'Orbitron',sans-serif;
+  font-size:22px;font-weight:800;color:#fff;
+  letter-spacing:.04em;
+  text-shadow:0 0 14px rgba(0,229,255,.5);
+  line-height:1;
+}
+.dc-arrow{
+  width:38px;height:38px;border-radius:12px;
+  background:rgba(32,227,178,.15);
+  border:1px solid rgba(32,227,178,.4);
+  display:grid;place-items:center;
+  color:var(--teal);font-size:14px;
+  position:relative;z-index:2;transition:.25s;
+}
+.dc-arrow:active{transform:scale(.9)}
+
+/* ══════ SVIP BANNER ══════ */
+.svip-banner{
+  margin:0 20px 20px;padding:16px 18px;border-radius:20px;
+  background:
+    radial-gradient(220px 100px at 0% 0%,rgba(255,215,0,.15),transparent 70%),
+    radial-gradient(220px 120px at 100% 100%,rgba(255,42,133,.1),transparent 70%),
+    linear-gradient(135deg,#1a0505 0%,#3a1111 40%,#120303 100%);
+  border:1.5px solid rgba(255,215,0,.55);
+  box-shadow:0 12px 30px rgba(0,0,0,.5),0 0 26px rgba(255,215,0,.2);
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;overflow:hidden;cursor:pointer;
+  transition:.25s;
+}
+.svip-banner:active{transform:scale(.98)}
+.svip-banner::before{
+  content:"";position:absolute;top:-50%;left:-60%;width:60%;height:200%;
+  background:linear-gradient(100deg,transparent,rgba(255,215,0,.25),transparent);
+  transform:skewX(-20deg);animation:svipSweep 5s ease-in-out infinite;
+}
+@keyframes svipSweep{0%{left:-60%}55%{left:130%}100%{left:130%}}
+.svip-left{display:flex;align-items:center;gap:14px;position:relative;z-index:2}
+.svip-crown{
+  width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(135deg,#ffd700,#d97706);
+  display:grid;place-items:center;
+  color:#1a0800;font-size:22px;
+  box-shadow:0 0 22px rgba(255,215,0,.7),inset 0 0 10px rgba(0,0,0,.3);
+  animation:crownPulse 2s ease-in-out infinite alternate;
+}
+@keyframes crownPulse{from{transform:scale(1)}to{transform:scale(1.06)}}
+.svip-text{display:flex;flex-direction:column;gap:3px}
+.svip-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:16px;font-weight:900;letter-spacing:.08em;
+  background:linear-gradient(90deg,#fff8dc,#ffd700,#ff9d00,#ffd700,#fff8dc);
+  background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:goldShift 5s ease infinite;
+}
+.svip-sub{font-size:10.5px;color:rgba(255,240,200,.7);font-weight:600;letter-spacing:.02em}
+.svip-enter{
+  padding:8px 14px;border-radius:12px;
+  background:linear-gradient(135deg,#ffd700,#d97706);
+  color:#1a0800;font-size:11px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;
+  border:none;cursor:pointer;
+  box-shadow:0 6px 18px rgba(255,215,0,.4);
+  position:relative;z-index:2;
+  display:flex;align-items:center;gap:6px;
+}
+
+/* ══════ MENU LIST ══════ */
+.menu-section{padding:0 20px}
+.menu-title{
+  font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;margin-bottom:10px;padding-left:4px;
+}
+.menu-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.menu-item{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px;border-radius:16px;
+  background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
+  border:1px solid var(--border);
+  cursor:pointer;transition:.25s;
+  backdrop-filter:blur(10px);
+}
+.menu-item:active{transform:scale(.985);background:rgba(212,175,55,.08);border-color:rgba(212,175,55,.45)}
+.menu-icon{
+  width:42px;height:42px;border-radius:14px;flex-shrink:0;
+  display:grid;place-items:center;font-size:17px;
+  background:linear-gradient(135deg,rgba(212,175,55,.2),rgba(32,227,178,.1));
+  border:1px solid rgba(212,175,55,.3);
+}
+.menu-icon.wallet{color:#f4dc8a}
+.menu-icon.bag{color:#20e3b2}
+.menu-icon.control{color:#00E5FF}
+.menu-icon.help{color:#a855f7}
+.menu-icon.logout{color:#ff6b8a}
+.menu-info{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.menu-name{font-size:14.5px;font-weight:700;color:#fff;letter-spacing:.01em}
+.menu-desc{font-size:11px;color:var(--muted);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.menu-arrow{color:rgba(212,175,55,.6);font-size:13px;transition:.25s}
+.menu-item:active .menu-arrow{color:var(--gold-2);transform:translateX(4px)}
+
+/* ══════ VERSION ══════ */
+.version-text{
+  text-align:center;font-size:10px;color:rgba(127,163,166,.6);
+  letter-spacing:.15em;padding:8px 20px 0;
+  font-weight:600;
+}
+
+/* ══════ MODALS — SHARED ══════ */
+.modal-overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(3,18,21,.85);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;
+  padding:20px;
+  animation:fadeIn .25s ease;
+}
+.modal-overlay.show{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.modal-card{
+  width:100%;max-width:380px;
+  background:
+    radial-gradient(300px 200px at 50% 0%,rgba(32,227,178,.08),transparent 60%),
+    linear-gradient(180deg,#0a272d 0%,#061c21 100%);
+  border:1.5px solid var(--border);
+  border-radius:26px;
+  padding:24px 20px;
+  box-shadow:0 30px 80px rgba(0,0,0,.85),0 0 40px rgba(32,227,178,.15);
+  animation:modalPop .35s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+  max-height:90vh;overflow-y:auto;
+}
+@keyframes modalPop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+.modal-card::-webkit-scrollbar{width:4px}
+.modal-card::-webkit-scrollbar-thumb{background:rgba(32,227,178,.4);border-radius:4px}
+
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:18px;padding-bottom:14px;
+  border-bottom:1px solid rgba(212,175,55,.15);
+}
+.modal-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:15px;font-weight:800;letter-spacing:.1em;
+  background:var(--gold-grad);background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:goldShift 6s ease infinite;
+}
+.modal-close{
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  color:var(--muted);font-size:15px;cursor:pointer;
+  display:grid;place-items:center;transition:.25s;
+}
+.modal-close:active{transform:scale(.9);color:#fff;background:rgba(255,107,138,.2)}
+
+/* ══════ CROP MODAL ══════ */
+.crop-box{
+  width:100%;height:300px;border-radius:16px;overflow:hidden;
+  background:#031215;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:center;
+}
+.crop-box img{max-width:100%;max-height:100%;display:block}
+.crop-actions{display:flex;gap:10px}
+.btn{
+  flex:1;padding:14px 16px;border-radius:14px;border:none;
+  font-family:inherit;font-size:14px;font-weight:700;
+  letter-spacing:.02em;cursor:pointer;transition:.25s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn:active{transform:scale(.96)}
+.btn-cancel{
+  background:rgba(255,255,255,.06);color:#fff;
+  border:1px solid rgba(255,255,255,.1);
+}
+.btn-primary{
+  background:linear-gradient(135deg,#20e3b2,#00E5FF);
+  color:#031215;
+  box-shadow:0 8px 22px rgba(32,227,178,.4);
+}
+.btn-gold{
+  background:var(--gold-grad);background-size:200% auto;
+  color:#1a1405;animation:goldShift 5s ease infinite;
+  box-shadow:0 8px 22px rgba(212,175,55,.4);
+}
+.btn-danger{
+  background:linear-gradient(135deg,#ff2a85,#a855f7);
+  color:#fff;
+  box-shadow:0 8px 22px rgba(255,42,133,.4);
+}
+
+/* ══════ NAME MODAL ══════ */
+.input-group{margin-bottom:16px}
+.input-label{
+  display:block;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(170,190,215,.75);font-weight:700;margin-bottom:8px;
+  padding-left:4px;
+}
+.input-field{
+  width:100%;height:52px;padding:0 18px;border-radius:14px;
+  background:rgba(3,18,21,.85);
+  border:1.5px solid rgba(32,227,178,.35);
+  color:#fff;font-family:inherit;font-size:15px;font-weight:600;
+  outline:none;transition:.25s;
+}
+.input-field:focus{
+  border-color:var(--teal);
+  box-shadow:0 0 0 3px rgba(32,227,178,.18),0 0 24px rgba(32,227,178,.25);
+}
+.input-hint{
+  font-size:11px;color:var(--muted);margin-top:6px;padding-left:4px;
+  display:flex;align-items:center;gap:6px;
+}
+.input-hint i{font-size:9px}
+
+/* ══════ SVIP MODAL ══════ */
+.svip-modal{
+  background:
+    radial-gradient(400px 300px at 50% 0%,rgba(255,215,0,.15),transparent 65%),
+    radial-gradient(400px 300px at 50% 100%,rgba(255,42,133,.08),transparent 65%),
+    linear-gradient(180deg,#1a0505 0%,#3a1111 40%,#120303 100%);
+  border:2px solid rgba(255,215,0,.6);
+  box-shadow:0 30px 80px rgba(0,0,0,.85),0 0 50px rgba(255,215,0,.35);
+  max-height:88vh;
+}
+
+/* SVIP Card */
+.svip-hero{
+  padding:20px 18px;border-radius:18px;margin-bottom:18px;
+  background:
+    radial-gradient(200px 120px at 0% 0%,rgba(32,227,178,.2),transparent 70%),
+    linear-gradient(135deg,#0c2f35 0%,#071e23 100%);
+  border:1px solid rgba(32,227,178,.4);
+  box-shadow:inset 0 0 20px rgba(32,227,178,.08);
+  position:relative;overflow:hidden;
+}
+.svip-hero::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,215,0,.08) 50%,transparent 100%);
+  animation:svipHeroSweep 3s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes svipHeroSweep{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+.svip-hero-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:24px;font-weight:900;letter-spacing:.08em;
+  background:linear-gradient(90deg,#20e3b2,#00E5FF,#20e3b2);
+  background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:goldShift 4s ease infinite;
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.svip-hero-title i{font-size:20px;color:#ffd700;-webkit-text-fill-color:initial;filter:drop-shadow(0 0 8px rgba(255,215,0,.7))}
+
+.recharge-info{
+  background:rgba(3,18,21,.6);
+  padding:10px 12px;border-radius:12px;
+  border:1px solid rgba(32,227,178,.2);
+  margin-top:8px;
+}
+.recharge-label{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12.5px;font-weight:700;color:#fff;margin-bottom:8px;
+}
+.recharge-label .coin{color:var(--teal);display:inline-flex;align-items:center;gap:4px}
+
+.progress-track{
+  height:8px;border-radius:6px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;position:relative;
+}
+.progress-fill{
+  height:100%;border-radius:6px;width:30%;
+  background:linear-gradient(90deg,#20e3b2,#00E5FF,#20e3b2);
+  background-size:200% auto;
+  animation:goldShift 3s ease infinite;
+  box-shadow:0 0 12px rgba(32,227,178,.6);
+  transition:width .6s cubic-bezier(.34,1.56,.64,1);
+}
+.progress-meta{
+  display:flex;justify-content:space-between;
+  margin-top:6px;font-size:10.5px;font-weight:700;
+}
+.progress-meta .curr{color:var(--teal)}
+.progress-meta .next{color:rgba(255,215,0,.85)}
+
+/* SVIP levels */
+.svip-levels-label{
+  font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(255,215,0,.7);font-weight:800;
+  margin-bottom:10px;padding-left:4px;
+}
+.svip-levels{
+  display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;
+  scrollbar-width:none;
+}
+.svip-levels::-webkit-scrollbar{display:none}
+.level-chip{
+  flex-shrink:0;padding:9px 18px;border-radius:999px;
+  background:rgba(255,215,0,.08);
+  border:1px solid rgba(255,215,0,.4);
+  color:rgba(255,215,0,.85);
+  font-size:12px;font-weight:800;
+  letter-spacing:.06em;cursor:pointer;
+  transition:.25s;font-family:'Orbitron',sans-serif;
+  white-space:nowrap;
+}
+.level-chip.active{
+  background:linear-gradient(135deg,#ffd700,#d97706);
+  color:#1a0800;
+  box-shadow:0 6px 18px rgba(255,215,0,.5),inset 0 1px 0 rgba(255,255,255,.5);
+  transform:scale(1.05);
+}
+
+/* ══════ TOAST ══════ */
+.toast{
+  position:fixed;bottom:100px;left:50%;
+  transform:translateX(-50%) translateY(20px);
+  padding:12px 22px;border-radius:999px;
+  background:linear-gradient(135deg,rgba(10,39,45,.98),rgba(3,18,21,.98));
+  border:1px solid rgba(32,227,178,.5);
+  color:#fff;font-size:13px;font-weight:600;
+  box-shadow:0 10px 30px rgba(0,0,0,.6),0 0 20px rgba(32,227,178,.3);
+  opacity:0;pointer-events:none;transition:.3s;
+  z-index:9999;max-width:88%;text-align:center;
+  display:flex;align-items:center;gap:8px;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast i{color:var(--teal)}
+
+/* ══════ LOGIN FALLBACK ══════ */
+.login-fallback{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:18px;padding:40px 24px;text-align:center;
+}
+.login-fallback.show{display:flex}
+.login-fallback .icon{
+  width:100px;height:100px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,rgba(32,227,178,.2),rgba(212,175,55,.05));
+  border:2px solid rgba(32,227,178,.5);
+  display:grid;place-items:center;font-size:40px;color:var(--teal);
+  box-shadow:0 0 40px rgba(32,227,178,.4);
+}
+.login-fallback h3{font-size:18px;color:#fff;font-weight:800}
+.login-fallback p{font-size:13px;color:var(--muted);line-height:1.6;max-width:280px}
+
+@media (max-height:700px){
+  .avatar-wrap{width:90px;height:90px}
+  .user-name{font-size:19px}
+  .menu-item{padding:12px 14px}
+  .menu-icon{width:38px;height:38px;font-size:15px}
+}
+</style>
+</head>
+<body>
+
+<!-- Aurora Background -->
+<div class="bg-aurora">
+  <span></span><span></span><span></span><span></span>
+</div>
+<div class="stars"></div>
+
+<!-- Loading Cover -->
+<div class="loading-cover" id="loadingCover">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">লোড হচ্ছে...</div>
+</div>
+
+<!-- Main App -->
+<div class="app-container" id="appContainer" style="display:none">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="back-btn" onclick="goBack()">
+      <i class="fa-solid fa-arrow-left"></i>
+    </div>
+    <div class="page-title">ME</div>
+    <div class="settings-btn" onclick="openSettingsModal()">
+      <i class="fa-solid fa-gear"></i>
+    </div>
+  </div>
+
+  <!-- Login Fallback -->
+  <div class="login-fallback" id="loginFallback">
+    <div class="icon"><i class="fa-solid fa-user-lock"></i></div>
+    <h3>লগইন প্রয়োজন</h3>
+    <p>আপনার profile দেখতে Google দিয়ে সাইন ইন করুন</p>
+  </div>
+
+  <!-- Profile Content -->
+  <div id="profileContent">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="avatar-wrap" onclick="document.getElementById('imageInput').click()">
+        <div class="avatar-pulse"></div>
+        <div class="avatar-ring"></div>
+        <div class="avatar-inner">
+          <img id="profileImage" src="https://ui-avatars.com/api/?name=User&background=0a272d&color=20e3b2&size=200" alt="Profile">
+        </div>
+        <div class="avatar-cam"><i class="fa-solid fa-camera"></i></div>
+      </div>
+
+      <div class="user-name-row">
+        <div class="user-name" id="userName">Loading...</div>
+        <div class="edit-name-btn" onclick="openNameModal()">
+          <i class="fa-solid fa-pen"></i>
+        </div>
+      </div>
+
+      <div class="user-uid-pill">
+        <i class="fa-solid fa-id-badge"></i>
+        <span id="userUid">— — — — — —</span>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-box" onclick="openFollowList('following')">
+        <div class="stat-num" id="statFollowing">0</div>
+        <div class="stat-lbl">Following</div>
+      </div>
+      <div class="stat-box" onclick="openFollowList('followers')">
+        <div class="stat-num" id="statFollowers">0</div>
+        <div class="stat-lbl">Followers</div>
+      </div>
+    </div>
+
+    <!-- Diamond Card -->
+    <div class="diamond-card" onclick="openWallet()">
+      <div class="dc-left">
+        <div class="dc-icon">💎</div>
+        <div class="dc-info">
+          <div class="dc-lbl">Diamond Balance</div>
+          <div class="dc-val" id="userDiamonds">0</div>
+        </div>
+      </div>
+      <div class="dc-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+    </div>
+
+    <!-- SVIP Banner -->
+    <div class="svip-banner" onclick="openSvipModal()">
+      <div class="svip-left">
+        <div class="svip-crown"><i class="fa-solid fa-crown"></i></div>
+        <div class="svip-text">
+          <div class="svip-title" id="svipBannerTitle">SVIP 1</div>
+          <div class="svip-sub">Recharge to get SVIP privileges</div>
+        </div>
+      </div>
+      <button class="svip-enter">
+        Enter <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+
+    <!-- Menu -->
+    <div class="menu-section">
+      <div class="menu-title">Account</div>
+      <div class="menu-list">
+        <div class="menu-item" onclick="openWallet()">
+          <div class="menu-icon wallet"><i class="fa-solid fa-wallet"></i></div>
+          <div class="menu-info">
+            <div class="menu-name">Wallet</div>
+            <div class="menu-desc">Diamonds & balance</div>
+          </div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="openBag()">
+          <div class="menu-icon bag"><i class="fa-solid fa-bag-shopping"></i></div>
+          <div class="menu-info">
+            <div class="menu-name">My Bag</div>
+            <div class="menu-desc">Gifts & items collected</div>
+          </div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="openUserControl()">
+          <div class="menu-icon control"><i class="fa-solid fa-sliders"></i></div>
+          <div class="menu-info">
+            <div class="menu-name">User Control</div>
+            <div class="menu-desc">Privacy & preferences</div>
+          </div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+      </div>
+
+      <div class="menu-title">Support</div>
+      <div class="menu-list">
+        <div class="menu-item" onclick="openHelp()">
+          <div class="menu-icon help"><i class="fa-solid fa-circle-question"></i></div>
+          <div class="menu-info">
+            <div class="menu-name">Help & Support</div>
+            <div class="menu-desc">Get help or contact us</div>
+          </div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="confirmLogout()">
+          <div class="menu-icon logout"><i class="fa-solid fa-right-from-bracket"></i></div>
+          <div class="menu-info">
+            <div class="menu-name">Sign Out</div>
+            <div class="menu-desc">Log out from this account</div>
+          </div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="version-text">MOI • Version 1.0.0</div>
+  </div>
+
+</div>
+
+<!-- Hidden Inputs -->
+<input type="file" id="imageInput" accept="image/*" style="display:none">
+
+<!-- Crop Modal -->
+<div class="modal-overlay" id="cropModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">CROP PHOTO</div>
+      <div class="modal-close" onclick="closeCropModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div class="crop-box">
+      <img id="imageToCrop" src="">
+    </div>
+    <div class="crop-actions">
+      <button class="btn btn-cancel" onclick="closeCropModal()">
+        <i class="fa-solid fa-xmark"></i> Cancel
+      </button>
+      <button class="btn btn-primary" id="cropBtn">
+        <i class="fa-solid fa-check"></i> Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Name Modal -->
+<div class="modal-overlay" id="nameModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">CHANGE NAME</div>
+      <div class="modal-close" onclick="closeNameModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Display Name</label>
+      <input type="text" class="input-field" id="newNameInput" maxlength="24" placeholder="Enter your name...">
+      <div class="input-hint">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>Max 24 characters • Visible to everyone</span>
+      </div>
+    </div>
+    <div class="crop-actions">
+      <button class="btn btn-cancel" onclick="closeNameModal()">
+        <i class="fa-solid fa-xmark"></i> Cancel
+      </button>
+      <button class="btn btn-primary" id="saveNameBtn">
+        <i class="fa-solid fa-check"></i> Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SVIP Modal -->
+<div class="modal-overlay" id="svipModal">
+  <div class="modal-card svip-modal">
+    <div class="modal-head" style="border-bottom-color:rgba(255,215,0,.25)">
+      <div class="modal-title" style="background:linear-gradient(90deg,#fff8dc,#ffd700,#ff9d00,#ffd700,#fff8dc);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">
+        <i class="fa-solid fa-crown" style="color:#ffd700;-webkit-text-fill-color:initial;margin-right:6px;filter:drop-shadow(0 0 8px rgba(255,215,0,.7))"></i>
+        SVIP PRIVILEGE
+      </div>
+      <div class="modal-close" onclick="closeSvipModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+
+    <div class="svip-hero">
+      <div class="svip-hero-title" id="svipHeroTitle">
+        <i class="fa-solid fa-crown"></i> SVIP 1
+      </div>
+      <div class="recharge-info">
+        <div class="recharge-label">
+          <span>Recharged</span>
+          <span class="coin"><i class="fa-solid fa-gem"></i> <span id="rechargeAmount">1,802,200</span></span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressBar"></div>
+        </div>
+        <div class="progress-meta">
+          <span class="curr" id="currentLevelText">SVIP 1</span>
+          <span class="next" id="nextLevelText">→ SVIP 2 (1,397,800 more)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="svip-levels-label">Select Level</div>
+    <div class="svip-levels">
+      <div class="level-chip active" onclick="switchSvipLevel(1,'3.2M',1802200,1397800,42)">SVIP 1</div>
+      <div class="level-chip" onclick="switchSvipLevel(2,'11.2M',9397800,5000000,65)">SVIP 2</div>
+      <div class="level-chip" onclick="switchSvipLevel(3,'31.2M',25000000,10000000,71)">SVIP 3</div>
+      <div class="level-chip" onclick="switchSvipLevel(4,'91.2M',75000000,25000000,75)">SVIP 4</div>
+      <div class="level-chip" onclick="switchSvipLevel(5,'251.2M',180000000,70000000,72)">SVIP 5</div>
+      <div class="level-chip" onclick="switchSvipLevel(6,'480M',350000000,130000000,73)">SVIP 6</div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">SETTINGS</div>
+      <div class="modal-close" onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div class="menu-list">
+      <div class="menu-item" onclick="toastMsg('শীঘ্রই আসছে','fa-clock')">
+        <div class="menu-icon control"><i class="fa-solid fa-bell"></i></div>
+        <div class="menu-info">
+          <div class="menu-name">Notifications</div>
+          <div class="menu-desc">Manage notification settings</div>
+        </div>
+        <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="toastMsg('শীঘ্রই আসছে','fa-clock')">
+        <div class="menu-icon help"><i class="fa-solid fa-lock"></i></div>
+        <div class="menu-info">
+          <div class="menu-name">Privacy</div>
+          <div class="menu-desc">Control who can see you</div>
+        </div>
+        <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="openLanguage()">
+        <div class="menu-icon bag"><i class="fa-solid fa-language"></i></div>
+        <div class="menu-info">
+          <div class="menu-name">Language</div>
+          <div class="menu-desc">বাংলা / English</div>
+        </div>
+        <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="showAbout()">
+        <div class="menu-icon wallet"><i class="fa-solid fa-circle-info"></i></div>
+        <div class="menu-info">
+          <div class="menu-name">About</div>
+          <div class="menu-desc">Version 1.0.0</div>
+        </div>
+        <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <i class="fa-solid fa-circle-check" id="toastIcon"></i>
+  <span id="toastText">Saved</span>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, update, get, remove } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+/* ══════ FIREBASE ══════ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCTn3QEYtRMxm7Y91RSFSvbRJSRHcXMEdI",
+  authDomain: "room-7fbf7.firebaseapp.com",
+  databaseURL: "https://room-7fbf7-default-rtdb.firebaseio.com",
+  projectId: "room-7fbf7",
+  storageBucket: "room-7fbf7.firebasestorage.app",
+  messagingSenderId: "417946695868",
+  appId: "1:417946695868:web:34c6f63269aaf659b2b8b9"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+const $ = id => document.getElementById(id);
+const DEFAULT_AV = 'https://ui-avatars.com/api/?name=User&background=0a272d&color=20e3b2&size=200';
+
+/* ══════ STATE ══════ */
+let me = { uid:'', name:'User', photo:DEFAULT_AV, email:'', moiId:'', diamonds:0 };
+let cropper = null;
+
+/* ══════ INIT ══════ */
+async function init(){
+  $('loadingText').textContent = 'প্রোফাইল লোড হচ্ছে...';
+
+  // 1. Try localStorage
+  try {
+    const stored = localStorage.getItem('moi_user');
+    if(stored){
+      const u = JSON.parse(stored);
+      if(u && u.uid){
+        me.uid = u.uid;
+        me.name = u.name || 'User';
+        me.photo = u.photo || u.avatar || DEFAULT_AV;
+        me.email = u.email || '';
+        me.moiId = u.moiId || '';
+      }
+    }
+  } catch(e){}
+
+  // 2. Wait for auth if no uid
+  if(!me.uid){
+    await new Promise(res => {
+      const unsub = onAuthStateChanged(auth, u => {
+        unsub();
+        if(u){
+          me.uid = u.uid;
+          me.name = u.displayName || me.name;
+          me.photo = u.photoURL || me.photo;
+          me.email = u.email || '';
+        }
+        res();
+      });
+    });
+  }
+
+  // 3. If still no uid — show login fallback
+  if(!me.uid){
+    $('loadingCover').classList.add('hidden');
+    $('appContainer').style.display = 'block';
+    $('loginFallback').classList.add('show');
+    $('profileContent').style.display = 'none';
+    return;
+  }
+
+  // 4. Load fresh data from Firebase
+  try {
+    const snap = await get(ref(db, 'users/' + me.uid));
+    if(snap.exists()){
+      const u = snap.val();
+      me.name = u.name || me.name;
+      me.photo = u.photo || u.avatar || me.photo;
+      me.email = u.email || me.email;
+      me.moiId = u.moiId || me.moiId;
+      me.diamonds = u.diamonds ?? 0;
+    }
+  } catch(e){ console.warn(e); }
+
+  // 5. Render
+  renderProfile();
+
+  // 6. Listen for real-time updates
+  onValue(ref(db, 'users/' + me.uid), snap => {
+    const u = snap.val() || {};
+    if(u.name) me.name = u.name;
+    if(u.photo || u.avatar) me.photo = u.photo || u.avatar;
+    if(u.diamonds !== undefined) me.diamonds = u.diamonds;
+    if(u.moiId) me.moiId = u.moiId;
+    renderProfile();
+  });
+
+  // Followers count
+  onValue(ref(db, 'follow/' + me.uid + '/followers'), snap => {
+    const n = snap.exists() ? Object.keys(snap.val()).length : 0;
+    $('statFollowers').textContent = n;
+  });
+  onValue(ref(db, 'follow/' + me.uid + '/following'), snap => {
+    const n = snap.exists() ? Object.keys(snap.val()).length : 0;
+    $('statFollowing').textContent = n;
+  });
+
+  // 7. Hide loading
+  $('loadingCover').classList.add('hidden');
+  $('appContainer').style.display = 'block';
+}
+
+function renderProfile(){
+  $('userName').textContent = me.name || 'User';
+  $('userUid').textContent = me.moiId || (me.uid ? me.uid.slice(0, 12) : '— — — — — —');
+  $('userDiamonds').textContent = (me.diamonds || 0).toLocaleString();
+  const img = $('profileImage');
+  img.src = me.photo || DEFAULT_AV;
+  img.onerror = () => { img.src = DEFAULT_AV; };
+}
+
+/* ══════ NAVIGATION ══════ */
+window.goBack = () => {
+  if(window.parent !== window){
+    try { window.parent.postMessage({ type: 'ME_CLOSE' }, '*'); } catch(e){}
+  }
+  if(history.length > 1) history.back();
+  else location.href = 'https://farjanaaktar1173-boop.github.io/Homepage/';
+};
+
+/* ══════ IMAGE CROP ══════ */
+const imageInput = $('imageInput');
+
+imageInput.addEventListener('change', (e) => {
+  const files = e.target.files;
+  if(!files || !files.length) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    $('imageToCrop').src = ev.target.result;
+    $('cropModal').classList.add('show');
+    if(cropper){ cropper.destroy(); cropper = null; }
+    setTimeout(() => {
+      cropper = new Cropper($('imageToCrop'), {
+        aspectRatio: 1,
+        viewMode: 1,
+        autoCropArea: 0.9,
+        background: false,
+        guides: false,
+        center: false,
+        highlight: false
+      });
+    }, 120);
+  };
+  reader.readAsDataURL(files[0]);
+});
+
+$('cropBtn').addEventListener('click', async () => {
+  if(!cropper) return;
+  const canvas = cropper.getCroppedCanvas({ width: 400, height: 400, imageSmoothingQuality: 'high' });
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+  // Update UI immediately
+  me.photo = dataUrl;
+  $('profileImage').src = dataUrl;
+
+  // Save to Firebase
+  try {
+    await update(ref(db, 'users/' + me.uid), { photo: dataUrl });
+    // Update localStorage
+    try {
+      const u = JSON.parse(localStorage.getItem('moi_user') || '{}');
+      u.photo = dataUrl;
+      localStorage.setItem('moi_user', JSON.stringify(u));
+    } catch(e){}
+    toastMsg('প্রোফাইল ছবি আপডেট হয়েছে');
+  } catch(e){
+    toastMsg('সেভ করা যায়নি', 'fa-triangle-exclamation');
+  }
+
+  closeCropModal();
+});
+
+function closeCropModal(){
+  $('cropModal').classList.remove('show');
+  if(cropper){ cropper.destroy(); cropper = null; }
+  imageInput.value = '';
+}
+
+/* ══════ NAME CHANGE ══════ */
+function openNameModal(){
+  if(!me.uid){ toastMsg('লগইন করুন', 'fa-lock'); return; }
+  $('newNameInput').value = me.name || '';
+  $('nameModal').classList.add('show');
+  setTimeout(() => $('newNameInput').focus(), 200);
+}
+function closeNameModal(){
+  $('nameModal').classList.remove('show');
+}
+
+$('saveNameBtn').addEventListener('click', async () => {
+  const newName = $('newNameInput').value.trim();
+  if(!newName){ toastMsg('নাম খালি রাখা যাবে না','fa-triangle-exclamation'); return; }
+  if(newName.length > 24){ toastMsg('সর্বোচ্চ ২৪ অক্ষর','fa-triangle-exclamation'); return; }
+
+  me.name = newName;
+  $('userName').textContent = newName;
+
+  try {
+    await update(ref(db, 'users/' + me.uid), { name: newName });
+    try {
+      const u = JSON.parse(localStorage.getItem('moi_user') || '{}');
+      u.name = newName;
+      localStorage.setItem('moi_user', JSON.stringify(u));
+    } catch(e){}
+    toastMsg('নাম আপডেট হয়েছে');
+  } catch(e){
+    toastMsg('সেভ করা যায়নি', 'fa-triangle-exclamation');
+  }
+
+  closeNameModal();
+});
+
+/* ══════ SVIP MODAL ══════ */
+function openSvipModal(){ $('svipModal').classList.add('show'); }
+function closeSvipModal(){ $('svipModal').classList.remove('show'); }
+
+window.switchSvipLevel = (level, total, current, needed, progress) => {
+  $('svipHeroTitle').innerHTML = `<i class="fa-solid fa-crown"></i> SVIP ${level}`;
+  $('svipBannerTitle').textContent = 'SVIP ' + level;
+  $('rechargeAmount').textContent = current.toLocaleString();
+  $('currentLevelText').textContent = 'SVIP ' + level;
+  $('nextLevelText').textContent = `→ SVIP ${level + 1} (${needed.toLocaleString()} more)`;
+  $('progressBar').style.width = progress + '%';
+  document.querySelectorAll('.level-chip').forEach((c, i) => {
+    c.classList.toggle('active', i + 1 === level);
+  });
+};
+
+/* ══════ SETTINGS MODAL ══════ */
+function openSettingsModal(){ $('settingsModal').classList.add('show'); }
+function closeSettingsModal(){ $('settingsModal').classList.remove('show'); }
+
+/* ══════ MENU ACTIONS ══════ */
+window.openWallet = () => {
+  toastMsg('Wallet • ' + (me.diamonds||0).toLocaleString() + ' 💎', 'fa-wallet');
+};
+window.openBag = () => {
+  toastMsg('ব্যাগ শীঘ্রই আসছে', 'fa-clock');
+};
+window.openUserControl = () => {
+  toastMsg('User Control শীঘ্রই আসছে', 'fa-clock');
+};
+window.openHelp = () => {
+  toastMsg('Help & Support শীঘ্রই আসছে', 'fa-clock');
+};
+window.openLanguage = () => {
+  toastMsg('Language শীঘ্রই আসছে', 'fa-clock');
+};
+window.showAbout = () => {
+  toastMsg('MOI • Version 1.0.0', 'fa-circle-info');
+};
+
+/* ══════ LOGOUT ══════ */
+window.confirmLogout = async () => {
+  if(!confirm('সাইন আউট করতে চান?')) return;
+  try {
+    await signOut(auth);
+    localStorage.removeItem('moi_user');
+    location.href = 'https://farjanaaktar1173-boop.github.io/Homepage/';
+  } catch(e){
+    toastMsg('সাইন আউট ব্যর্থ', 'fa-triangle-exclamation');
+  }
+};
+
+/* ══════ TOAST ══════ */
+let toastTimer;
+window.toastMsg = (msg, icon='fa-circle-check') => {
+  const t = $('toast');
+  $('toastText').textContent = msg;
+  $('toastIcon').className = 'fa-solid ' + icon;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+};
+
+/* ══════ CLOSE MODALS ON BACKDROP ══════ */
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', (e) => {
+    if(e.target === m) m.classList.remove('show');
+  });
+});
+
+/* ══════ START ══════ */
+setTimeout(() => init(), 100);
+
+// Safety timeout
+setTimeout(() => {
+  const lc = $('loadingCover');
+  if(lc && !lc.classList.contains('hidden')){
+    lc.classList.add('hidden');
+    $('appContainer').style.display = 'block';
+  }
+}, 6000);
+
+console.log('%c👤 Me page loaded','color:#20e3b2;font-weight:bold;font-size:14px');
+</script>
+</body>
+</html>
