@@ -1,0 +1,118 @@
+rules_version = '2';
+// MOI — Firestore নিরাপত্তা নিয়ম
+// মূল নিয়ম: diamonds, role, level, xp, crown, badges, isBanned — ক্লায়েন্ট কখনও লিখতে পারবে না (শুধু Cloud Function)।
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isAnon() { return request.auth.token.firebase.sign_in_provider == 'anonymous'; }
+    function meDoc() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function notBanned() {
+      return meDoc().isBanned != true || (meDoc().banExpiresAt != null && meDoc().banExpiresAt < request.time);
+    }
+    // গেস্ট ও নিষিদ্ধ নয় এমন সাধারণ সদস্য
+    function member() { return signedIn() && !isAnon() && notBanned(); }
+    function isStaff() { return signedIn() && meDoc().role in ['developer', 'superadmin']; }
+    function isRoomStaff(roomId) {
+      let r = get(/databases/$(database)/documents/rooms/$(roomId)).data;
+      return r.ownerUid == request.auth.uid || request.auth.uid in r.admins;
+    }
+    function inChat(chatId) { return signedIn() && request.auth.uid in chatId.split('__'); }
+
+    // ───── ইউজার ─────
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create, delete: if false;                       // তৈরি করে ensureProfile ফাংশন
+      allow update: if signedIn() && request.auth.uid == uid && notBanned()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(
+             ['name','photo','bio','country','gender','birthday','voice','lastSeen','lastActiveRoomId','fcmToken','profileComplete','prefs','theme'])
+        && request.resource.data.name is string && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 24
+        && (!('bio' in request.resource.data) || request.resource.data.bio.size() <= 200);
+    }
+    match /moiIds/{id} { allow get: if signedIn(); allow list, write: if false; }
+    match /meta/{doc} { allow read, write: if false; }
+
+    // ───── রুম ─────
+    match /rooms/{roomId} {
+      allow read: if signedIn();
+      allow create, delete: if false;                       // createRoom / deleteRoom ফাংশন
+      allow update: if member() && (resource.data.ownerUid == request.auth.uid || request.auth.uid in resource.data.admins)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(
+             ['name','logo','wallpaper','topic','tags','category','country','language','rules','micSeatCount','isLive','mutedUsers','bannedUsers','updatedAt']);
+
+      match /messages/{msgId} {
+        allow read: if signedIn();
+        allow create: if member() && request.resource.data.senderUid == request.auth.uid
+          && request.resource.data.type != 'gift'           // গিফট মেসেজ শুধু সার্ভার লিখতে পারে
+          && request.resource.data.ts is number;
+        allow update: if member() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions','isDeleted'])
+          && (resource.data.senderUid == request.auth.uid || isRoomStaff(roomId) || isStaff()
+              || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions']));
+        allow delete: if member() && (resource.data.senderUid == request.auth.uid || isRoomStaff(roomId) || isStaff());
+      }
+    }
+
+    // ───── ১-টু-১ চ্যাট (chatId = দুই uid, sort করে "__" দিয়ে জোড়া) ─────
+    match /chats/{chatId} {
+      allow read: if inChat(chatId);
+      allow create, update: if member() && inChat(chatId) && request.resource.data.participants == chatId.split('__');
+      match /messages/{msgId} {
+        allow read: if inChat(chatId);
+        allow create: if member() && inChat(chatId) && request.resource.data.senderUid == request.auth.uid
+          && request.resource.data.type != 'gift' && request.resource.data.ts is number
+          && !exists(/databases/$(database)/documents/blocked/$(chatId.split('__')[0] == request.auth.uid ? chatId.split('__')[1] : chatId.split('__')[0])/list/$(request.auth.uid));
+        allow update: if member() && inChat(chatId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['seen','delivered','reactions','deleted']);
+        allow delete: if member() && resource.data.senderUid == request.auth.uid;
+      }
+    }
+    match /chatMeta/{owner}/with/{partner} {
+      allow read: if signedIn() && request.auth.uid == owner;
+      allow write: if member() && (request.auth.uid == owner || request.auth.uid == partner);
+    }
+
+    // ───── বন্ধু / অনুরোধ / ফলো / ব্লক ─────
+    match /friends/{uid}/list/{f} {
+      allow read: if signedIn();
+      allow create: if member() && (request.auth.uid == uid
+        || (request.auth.uid == f && (exists(/databases/$(database)/documents/friendRequests/$(request.auth.uid)/incoming/$(uid))
+                                     || exists(/databases/$(database)/documents/friends/$(request.auth.uid)/list/$(uid)))));
+      allow update: if member() && (request.auth.uid == uid || request.auth.uid == f);
+      allow delete: if member() && (request.auth.uid == uid || request.auth.uid == f);
+    }
+    match /friendRequests/{uid}/incoming/{from} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create: if member() && request.auth.uid == from && uid != from;
+      allow delete: if member() && (request.auth.uid == uid || request.auth.uid == from);
+    }
+    match /sentRequests/{uid}/list/{t} { allow read, write: if member() && request.auth.uid == uid; }
+    match /follows/{uid}/following/{t} { allow read: if signedIn(); allow write: if member() && request.auth.uid == uid && uid != t; }
+    match /follows/{uid}/followers/{f}  { allow read: if signedIn(); allow write: if member() && request.auth.uid == f && uid != f; }
+    match /blocked/{uid}/list/{b} {
+      allow get: if signedIn() && (request.auth.uid == uid || request.auth.uid == b);
+      allow list: if signedIn() && request.auth.uid == uid;
+      allow write: if member() && request.auth.uid == uid;
+    }
+
+    // ───── ব্যক্তিগত ডেটা ─────
+    match /userKV/{uid}/items/{name} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if signedIn() && request.auth.uid == uid && request.resource.data.keys().hasOnly(['v']);
+    }
+    match /userState/{uid}/items/{name} {                  // চেক-ইন, স্পিন, ফ্রেম… শুধু সার্ভার লেখে
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // ───── লেনদেন, গিফট, রিপোর্ট ─────
+    match /transactions/{id} { allow read: if signedIn() && (request.auth.uid in resource.data.participants || isStaff()); allow write: if false; }
+    match /gifts/{id} { allow read: if signedIn() && (resource.data.senderUid == request.auth.uid || resource.data.targetUid == request.auth.uid || isStaff()); allow write: if false; }
+    match /reports/{id} {
+      allow create: if member() && request.resource.data.reporterUid == request.auth.uid;
+      allow read, update: if isStaff();
+      allow delete: if false;
+    }
+    match /crowns/{id} { allow read: if signedIn(); allow write: if signedIn() && meDoc().role == 'developer'; }
+    match /badges/{id} { allow read: if signedIn(); allow write: if signedIn() && meDoc().role == 'developer'; }
+  }
+}

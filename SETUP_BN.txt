@@ -1,0 +1,54 @@
+MOI — রিয়েল Firebase সংস্করণ — সেটআপ গাইড (বাংলা)
+=====================================================
+প্রজেক্ট: room-7fbf7  (কনফিগ shared/core/firebase-init.js এ বসানো আছে)
+
+⚠️ সৎ কথা: আমার পরীক্ষার জায়গা থেকে আসল Firebase-এ পৌঁছানো যায়নি। তাই লজিক নকল Firebase দিয়ে
+পরীক্ষা করেছি (লগইন, রুম, গিফট, চ্যাট, অ্যাডমিন প্যানেল চলে)। কিন্তু Security Rules ও Cloud Functions
+আসল Firebase-এ প্রথমবার ডিপ্লয় করার পর আপনাকে নিজে একবার ঘুরে দেখতে হবে। কিছু ভাঙলে আমাকে
+এরর মেসেজ দিন, ঠিক করে দেব।
+
+ধাপ ১ — Firebase Console (console.firebase.google.com → room-7fbf7)
+  1. Billing: "Blaze (pay-as-you-go)" প্ল্যানে আপগ্রেড করুন (Cloud Functions-এর জন্য বাধ্যতামূলক; ছোট ব্যবহারে প্রায় ফ্রি)।
+  2. Build → Authentication → Get started → Sign-in method:
+       • Phone  → Enable   (আসল SMS যায়; কিছু দেশে খরচ/সীমা আছে। টেস্টের জন্য "Phone numbers for testing" এ নম্বর+কোড দিতে পারেন)
+       • Google → Enable
+       • Anonymous → Enable (গেস্টের জন্য; গেস্ট শুধু দেখতে পারে, গিফট/চ্যাট/মাইক পারে না)
+     Settings → Authorized domains → আপনার হোস্ট করা ডোমেইন যোগ করুন (localhost আগে থেকেই আছে)।
+  3. Build → Firestore Database → Create database (production mode, region আপনার কাছের)।
+  4. Build → Realtime Database → Create database (locked mode)। URL: https://room-7fbf7-default-rtdb.firebaseio.com
+  5. Build → Storage → Get started।
+
+ধাপ ২ — কম্পিউটারে (Node.js 20 লাগবে)
+  npm install -g firebase-tools
+  firebase login
+  cd functions && npm install && cd ..
+  firebase deploy --only functions,firestore:rules,firestore:indexes,database,storage
+  (Storage rules প্রথমবার ডিপ্লয়ে Firestore-পড়ার অনুমতি চাইলে "Yes/Grant" দিন।)
+  ইনডেক্স তৈরি হতে কয়েক মিনিট লাগে; Console-এ Firestore → Indexes এ "Building" শেষ হওয়া পর্যন্ত অপেক্ষা করুন।
+
+ধাপ ৩ — প্রথম Developer বানানো (একবারই, হাতে)
+  1. অ্যাপে নিজের নম্বর/Google দিয়ে লগইন করুন (ইউজার ডক তৈরি হবে)।
+  2. Firestore → users → আপনার uid-এর ডকুমেন্ট খুলুন → role ফিল্ড "developer" করুন।
+  3. Realtime Database → moi-live → staff → <আপনার uid> = "developer" যোগ করুন।
+  4. এখন Home-এ "Panel" বাটন আসবে → admin/developer। এখান থেকে অন্যদের রোল, ব্যাজ, মুকুট, ডায়মন্ড দিন।
+     Distributor বানাতে: ইউজারকে role=distributor দিন, তারপর ডায়মন্ড স্টক দিন (ডায়মন্ড ট্যাব)।
+
+ধাপ ৪ — চালানো
+  লোকাল:  python3 -m http.server 8000   → http://localhost:8000/login/index.html
+  অনলাইন: firebase deploy --only hosting  (firebase.json এ hosting যোগ করে) বা যেকোনো স্ট্যাটিক হোস্টিং।
+
+কী কী এখন আসল
+  • লগইন: Phone OTP (reCAPTCHA), Google, Guest — ডেমো/ফেক ইউজার ও ফেক বট সব মুছে ফেলা হয়েছে।
+  • ডায়মন্ড: ক্লায়েন্ট আর বানাতে/কাটতে পারে না। সব হিসাব Cloud Functions-এ (গিফট, চেক-ইন, স্পিন, মিশন,
+    লাকি বক্স, স্টোর, ইনভাইট কোড)। ফ্রি Recharge ও P2P Send বাদ — ডায়মন্ড কিনতে হয় অফিসিয়াল Distributor থেকে।
+  • রুম: মাইক সিট, শ্রোতা, উপস্থিতি, লাইক, হাত তোলা, PK, গিফট অ্যানিমেশন — সবার স্ক্রিনে রিয়েলটাইম।
+  • রোল: developer > superadmin > distributor > admin > vip > user > guest; রুমে owner/admin সার্ভারে যাচাই হয়।
+  • চ্যাট: ১-টু-১, ছবি/ভিডিও/ভয়েস Storage-এ, ব্লক, বন্ধু-অনুরোধ, চ্যাটে ডায়মন্ড উপহার।
+  • মুকুট/ফ্রেম/ব্যাজ: Store ও অ্যাডমিন প্যানেল থেকে।
+
+যা এখনো নেই (সৎভাবে)
+  • আসল ভয়েস/মাইক অডিও স্ট্রিমিং: রুমে সিটে ওঠা ও মিউট UI আসল, কিন্তু অডিও পাঠাতে Agora/ZegoCloud/LiveKit
+    লাগে (আলাদা কী ও টোকেন-ফাংশন)। বললে পরের ধাপে যোগ করে দেব।
+  • ভয়েস কল (চ্যাটে): শুধু UI।
+  • Capacitor/APK করলে Google লগইনের জন্য নেটিভ প্লাগিন লাগবে।
+  • App Check (বট ঠেকানো) চাইলে পরে চালু করতে পারেন।
