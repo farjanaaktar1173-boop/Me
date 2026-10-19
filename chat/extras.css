@@ -1,0 +1,45 @@
+/* chat/extras.css — Chat এর নতুন ফিচারের স্টাইল */
+.cx-list{display:flex;flex-direction:column;gap:8px}
+.cx-row{display:flex;align-items:center;gap:14px;width:100%;padding:12px 14px;border-radius:16px;border:1px solid rgba(var(--c2-rgb),.18);background:rgba(255,255,255,.045);color:#fff;font-family:inherit;text-align:left;cursor:pointer;transition:.2s}
+.cx-row:active{transform:scale(.98);background:rgba(var(--c1-rgb),.14)}
+.cx-ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:15px;background:linear-gradient(135deg,rgba(var(--c1-rgb),.28),rgba(var(--c2-rgb),.2));color:var(--c3);flex-shrink:0}
+.cx-tx{display:flex;flex-direction:column;gap:2px;min-width:0}.cx-tx b{font-size:14.5px;font-weight:700}.cx-tx small{font-size:11.5px;color:var(--mute)}
+.cx-row.danger .cx-ic{background:rgba(255,77,109,.18);color:#ff7a93}.cx-row.danger b{color:#ff9fb0}
+
+.cx-search{display:none;align-items:center;gap:10px;padding:9px 16px;background:rgba(var(--bg1-rgb),.9);border-bottom:1px solid rgba(var(--c2-rgb),.16)}
+.cx-search.show{display:flex}
+.cx-search i{color:var(--mute)}
+.cx-search input{flex:1;min-width:0;background:none;border:none;outline:none;color:#fff;font-size:14px}
+.cx-search span{font-size:11px;color:var(--c2);white-space:nowrap}
+
+.cx-typing{display:flex;gap:5px;align-items:center;width:auto!important;padding:13px 16px}
+.cx-typing i{width:7px;height:7px;border-radius:50%;background:var(--c3);opacity:.5;animation:cxDot 1.1s infinite ease-in-out}
+.cx-typing i:nth-child(2){animation-delay:.16s}.cx-typing i:nth-child(3){animation-delay:.32s}
+@keyframes cxDot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+
+.cx-react{position:absolute;right:10px;bottom:-12px;font-size:14px;line-height:1;padding:3px 6px;border-radius:999px;background:rgba(var(--bg2-rgb),.98);border:1px solid rgba(var(--c1-rgb),.5);box-shadow:0 4px 12px rgba(0,0,0,.4);animation:cxPop .35s cubic-bezier(.3,1.6,.5,1)}
+@keyframes cxPop{from{transform:scale(0)}to{transform:scale(1)}}
+.msg-wrap:has(.cx-react){margin-bottom:12px}
+
+.cx-quick{display:flex;gap:8px;overflow-x:auto;padding:8px 12px 2px;scrollbar-width:none;flex-shrink:0}
+.cx-quick::-webkit-scrollbar{display:none}
+.cx-quick button{flex-shrink:0;padding:7px 13px;border-radius:999px;border:1px solid rgba(var(--c2-rgb),.35);background:rgba(var(--c1-rgb),.1);color:var(--c3);font:600 12.5px inherit;font-family:inherit;cursor:pointer;transition:.2s}
+.cx-quick button:active{transform:scale(.94);background:rgba(var(--c1-rgb),.3)}
+
+.cx-prof{text-align:center;padding:6px 0 4px}
+.cx-prof img{width:92px;height:92px;border-radius:50%;object-fit:cover;border:3px solid var(--c2);box-shadow:0 0 0 5px rgba(var(--c1-rgb),.18),0 10px 30px rgba(0,0,0,.5)}
+.cx-prof h3{margin:12px 0 2px;font:700 20px 'Bricolage Grotesque','Hind Siliguri',sans-serif}
+.cx-prof p{color:var(--mute);font-size:12.5px}
+.cx-stats{display:flex;justify-content:center;gap:22px;margin:14px 0;font-size:12.5px;color:var(--mute)}.cx-stats b{color:#fff;margin-right:4px}
+.cx-actions{display:flex;gap:10px}.cx-actions .mx-btn{flex:1}
+
+.cx-bal{text-align:center;font-size:13px;color:var(--mute);margin-bottom:14px}.cx-bal b{color:var(--c3);font-size:20px}
+.cx-amts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cx-amts button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 6px;border-radius:16px;border:1px solid rgba(var(--c2-rgb),.3);background:rgba(255,255,255,.05);color:#fff;font-family:inherit;cursor:pointer}
+.cx-amts button b{font-size:18px}.cx-amts button:active{transform:scale(.94);border-color:var(--c1)}
+
+.cx-chip{padding:5px 12px;border-radius:999px;font-size:11.5px;font-weight:700;background:var(--grad-brand);color:var(--on)}
+.cx-chip.on{background:rgba(255,255,255,.08);color:var(--mute);border:1px solid rgba(255,255,255,.12)}
+.cx-pin{font-size:10px;color:var(--c2);margin-left:4px}
+.u-unread.muted{background:rgba(255,255,255,.18);color:#fff}
+.tabs .tab{white-space:nowrap}

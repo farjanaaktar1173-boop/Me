@@ -1,1 +1,155 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<script src="../shared/theme.js"></script>
+<script src="../shared/fallback.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MOI Chat</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="chat.css">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400..800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/theme.css">
+<link rel="stylesheet" href="../shared/features.css">
+<link rel="stylesheet" href="extras.css">
+</head>
+<body>
 
+<div class="bg-orbs"><span></span><span></span><span></span></div>
+
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+        <div class="login-icon">💬</div>
+        <h1>MOI Chat</h1>
+        <p>বন্ধুদের সাথে কথা বলতে এবং নতুন বন্ধু তৈরি করতে সাইন ইন করুন।</p>
+        <button class="login-btn" onclick="goToLogin()"><i class="fa-solid fa-arrow-right-to-bracket"></i> Go to Login</button>
+    </div>
+</div>
+
+<div class="screen" id="mainScreen">
+    <div class="header">
+        <div class="my-profile">
+            <div class="my-av"><img id="myAvatar" src="" alt="Me"></div>
+            <div class="my-info">
+                <div class="mname" id="myName">—</div>
+                <div class="muid" id="myUid">—</div>
+            </div>
+        </div>
+        <div class="hdr-actions">
+            <div class="icon-btn" onclick="copyMyUid()" title="UID কপি"><i class="fa-solid fa-copy"></i></div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="friends" onclick="switchTab('friends')">বন্ধু</div>
+        <div class="tab" data-tab="requests" onclick="switchTab('requests')">Requests<span class="tab-badge" id="reqBadge">0</span></div>
+    </div>
+
+    <div class="search-wrap" id="searchWrap">
+        <input type="text" id="searchInput" placeholder="🔍 বন্ধু খুঁজুন...">
+    </div>
+
+    <div class="list-area" id="listArea">
+        <div class="empty"><div class="big">💬</div>লোড হচ্ছে...</div>
+    </div>
+</div>
+
+<div class="chat-screen" id="chatScreen">
+    <div class="chat-header">
+        <div class="back-btn" onclick="backToList()"><i class="fa-solid fa-arrow-left"></i></div>
+        <div class="av-wrap" id="chatAvWrap"><img id="chatAvatar" src="" alt=""></div>
+        <div class="chat-info">
+            <div class="cn" id="chatName">—</div>
+            <div class="cs" id="chatStatus">—</div>
+        </div>
+        <div class="hdr-btns" id="chatHeaderBtns">
+            <div class="icon-btn" onclick="startCall()" title="অডিও কল" id="callBtn"><i class="fa-solid fa-phone"></i></div>
+        </div>
+    </div>
+
+    <div class="chat-body" id="chatBody"></div>
+
+    <div class="rec-bar" id="recBar">
+        <span class="dot"></span><span>রেকর্ডিং...</span><span id="recTime">00:00</span>
+        <button onclick="stopRecording()" style="background:#ef4444;border:none;color:#fff;padding:6px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-left:8px;">পাঠান</button>
+        <button onclick="cancelRecording()" style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">বাতিল</button>
+    </div>
+
+    <div class="reply-bar" id="replyBar">
+        <div class="rb-left"></div>
+        <div class="rb-content">
+            <div class="rb-name" id="replyName">—</div>
+            <div class="rb-text" id="replyText">—</div>
+        </div>
+        <button class="rb-close" onclick="cancelReply()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="emoji-picker" id="emojiPicker"></div>
+
+    <div class="chat-footer" id="chatFooter">
+        <div class="actions">
+            <label for="imageInput" class="act-btn"><i class="fa-regular fa-image"></i></label>
+            <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="sendFile(event,'image')">
+            <label for="videoInput" class="act-btn"><i class="fa-solid fa-video"></i></label>
+            <input type="file" id="videoInput" accept="video/*" style="display:none" onchange="sendFile(event,'video')">
+            <button class="act-btn" id="micBtn" onclick="toggleRecording()"><i class="fa-solid fa-microphone"></i></button>
+        </div>
+        <div class="input-box">
+            <input type="text" id="messageInput" placeholder="Aa" onkeypress="if(event.key==='Enter')sendText()">
+            <i class="fa-regular fa-face-smile emoji-trigger" onclick="toggleEmojiPicker(event)"></i>
+        </div>
+        <button class="send-btn" onclick="sendText()"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+
+    <div class="add-friend-cta" id="addFriendCta" style="display:none;">
+        <div class="af-msg">💬 কথা বলতে এই ইউজারকে আগে বন্ধু হতে হবে।</div>
+        <div class="af-buttons">
+            <button class="af-add" id="afAddBtn" onclick="sendFriendRequest()"><i class="fa-solid fa-user-plus"></i> Add Friend</button>
+        </div>
+    </div>
+</div>
+
+<div class="sheet-overlay" id="msgSheet" onclick="if(event.target===this)closeMsgSheet()">
+    <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div id="msgSheetBody"></div>
+        <button class="sheet-btn cancel" onclick="closeMsgSheet()">বাতিল</button>
+    </div>
+</div>
+
+<div class="call-overlay" id="callOverlay">
+    <div class="call-card">
+        <div class="call-emoji">📞</div>
+        <div class="cav"><img id="callAvatar" src=""></div>
+        <h3 id="callName">—</h3>
+        <p id="callStatusText">সংযোগ করা হচ্ছে...</p>
+        <div class="call-actions">
+            <button class="call-btn reject" onclick="hangupCall()"><i class="fa-solid fa-phone-slash"></i></button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
+<script src="../shared/config.js"></script>
+<script src="../shared/core/firebase-init.js"></script>
+<script src="../shared/core/sync.js"></script>
+<script src="../shared/core/sync-routes.js"></script>
+<script src="../shared/storage.js"></script>
+<script src="../shared/core/economy.js"></script>
+<script src="../shared/core/db-storage.js"></script>
+<script src="../shared/core/auth.js"></script>
+<script src="friends.js"></script>
+<script src="messages.js"></script>
+<script src="emoji.js"></script>
+<script src="chat.js"></script>
+<script src="../shared/features.js"></script>
+<script src="extras.js"></script>
+</body>
+</html>
