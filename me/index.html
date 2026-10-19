@@ -1,1 +1,370 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<script src="../shared/theme.js"></script>
+<script src="../shared/fallback.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<title>MOI — Me</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400..800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="me.css">
+<link rel="stylesheet" href="../shared/theme.css">
+<link rel="stylesheet" href="../shared/features.css">
+</head>
+<body>
 
+<div class="bg-aurora"><span></span><span></span><span></span><span></span></div>
+<div class="stars"></div>
+
+<div class="loading-cover" id="loadingCover">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">লোড হচ্ছে...</div>
+</div>
+
+<div class="app-container" id="appContainer" style="display:none">
+
+  <div class="top-bar">
+    <div class="back-btn" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i></div>
+    <div class="page-title">ME</div>
+    <div class="settings-btn" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i></div>
+  </div>
+
+  <div class="login-fallback" id="loginFallback">
+    <div class="icon"><i class="fa-solid fa-user-lock"></i></div>
+    <h3>লগইন প্রয়োজন</h3>
+    <p>আপনার profile দেখতে Login করুন</p>
+  </div>
+
+  <div id="profileContent">
+    <div class="profile-header">
+      <div class="avatar-wrap" onclick="document.getElementById('imageInput').click()">
+        <div class="avatar-pulse"></div>
+        <div class="avatar-ring"></div>
+        <div class="avatar-inner"><img id="profileImage" src="" alt="Profile"></div>
+        <div class="avatar-cam"><i class="fa-solid fa-camera"></i></div>
+      </div>
+      <div class="user-name-row">
+        <div class="user-name" id="userName">Loading...</div>
+        <div class="edit-name-btn" onclick="openNameModal()"><i class="fa-solid fa-pen"></i></div>
+      </div>
+      <div class="user-uid-pill"><i class="fa-solid fa-id-badge"></i><span id="userUid">— — — — — —</span></div>
+      <button class="bio-line" id="bioLine" onclick="openBio()"><span id="bioText">আপনার সম্পর্কে কিছু লিখুন…</span><i class="fa-solid fa-pen"></i></button>
+      <div class="me-actions">
+        <button class="me-act" onclick="MOI.openShare()"><i class="fa-solid fa-share-nodes"></i> Share</button>
+        <button class="me-act" onclick="MOI.openInvite()"><i class="fa-solid fa-user-plus"></i> Invite</button>
+        <button class="me-act" onclick="MOI.openTheme()"><i class="fa-solid fa-palette"></i> Theme</button>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box" onclick="openFollowList('following')">
+        <div class="stat-num" id="statFollowing">0</div>
+        <div class="stat-lbl">Following</div>
+      </div>
+      <div class="stat-box" onclick="openFollowList('followers')">
+        <div class="stat-num" id="statFollowers">0</div>
+        <div class="stat-lbl">Followers</div>
+      </div>
+    </div>
+
+    <div class="lvl-card" id="lvlCard" onclick="MOI.openBadges()">
+      <div class="lvl-num" id="lvlNum">1</div>
+      <div class="lvl-info"><div class="lvl-top"><b id="lvlTitle">Rookie</b><span id="lvlXp">0 / 100 XP</span></div>
+        <div class="mx-bar"><i id="lvlBar" style="width:0%"></i></div>
+        <small>Badges ও রিওয়ার্ড দেখতে চাপুন</small></div>
+      <i class="fa-solid fa-chevron-right lvl-arrow"></i>
+    </div>
+
+    <div class="svip-banner" onclick="openSvipModal()">
+      <div class="svip-left">
+        <div class="svip-crown"><i class="fa-solid fa-crown"></i></div>
+        <div class="svip-text">
+          <div class="svip-title" id="svipBannerTitle">SVIP 1</div>
+          <div class="svip-sub">Recharge to get SVIP privileges</div>
+        </div>
+      </div>
+      <button class="svip-enter">Enter <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+
+
+    <div class="menu-section">
+      <div class="menu-title">Rewards</div>
+      <div class="menu-list">
+        <div class="menu-item" onclick="MOI.openCheckin()">
+          <div class="menu-icon wallet"><i class="fa-solid fa-calendar-check"></i></div>
+          <div class="menu-info"><div class="menu-name">Daily Check-in</div><div class="menu-desc">প্রতিদিন ডায়মন্ড ও স্ট্রিক বোনাস</div></div>
+          <span class="menu-pill" id="pillCheckin">NEW</span><div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="MOI.openSpin()">
+          <div class="menu-icon bag"><i class="fa-solid fa-dharmachakra"></i></div>
+          <div class="menu-info"><div class="menu-name">Lucky Spin</div><div class="menu-desc">প্রতিদিন একটা ফ্রি Spin</div></div>
+          <span class="menu-pill" id="pillSpin">FREE</span><div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="MOI.openLeaderboard()">
+          <div class="menu-icon control"><i class="fa-solid fa-ranking-star"></i></div>
+          <div class="menu-info"><div class="menu-name">Leaderboard</div><div class="menu-desc">Rich, Gifters ও Rooms র‍্যাঙ্কিং</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="MOI.openStore()">
+          <div class="menu-icon help"><i class="fa-solid fa-store"></i></div>
+          <div class="menu-info"><div class="menu-name">Store</div><div class="menu-desc">অবতার ফ্রেম কিনুন</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="MOI.openNotifs()">
+          <div class="menu-icon logout"><i class="fa-solid fa-bell"></i></div>
+          <div class="menu-info"><div class="menu-name">Notifications</div><div class="menu-desc">আপনার সব আপডেট</div></div>
+          <span class="menu-pill hot" id="pillNotif" style="display:none">0</span><div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-title">Social & Profile</div>
+      <div class="menu-list">
+        <div class="menu-item" onclick="openMissions()">
+          <div class="menu-icon wallet"><i class="fa-solid fa-list-check"></i></div>
+          <div class="menu-info"><div class="menu-name">Daily Missions</div><div class="menu-desc">মিশন শেষ করে ডায়মন্ড জিতুন</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="openFriends()">
+          <div class="menu-icon bag"><i class="fa-solid fa-user-group"></i></div>
+          <div class="menu-info"><div class="menu-name">Friends</div><div class="menu-desc">আপনার বন্ধুদের তালিকা</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="openMyRooms()">
+          <div class="menu-icon control"><i class="fa-solid fa-door-open"></i></div>
+          <div class="menu-info"><div class="menu-name">My Rooms</div><div class="menu-desc">আপনার তৈরি রুমগুলো</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="openVisitors()">
+          <div class="menu-icon help"><i class="fa-solid fa-eye"></i></div>
+          <div class="menu-info"><div class="menu-name">Profile Visitors</div><div class="menu-desc">কারা আপনার প্রোফাইল দেখেছে</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="openDetails()">
+          <div class="menu-icon wallet"><i class="fa-solid fa-id-card"></i></div>
+          <div class="menu-info"><div class="menu-name">Profile Details</div><div class="menu-desc">Gender, Birthday ও Country</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="openBlocked()">
+          <div class="menu-icon logout"><i class="fa-solid fa-ban"></i></div>
+          <div class="menu-info"><div class="menu-name">Blocked Users</div><div class="menu-desc">ব্লক করা ইউজার ম্যানেজ করুন</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-title">Account</div>
+      <div class="menu-list">
+        <div class="menu-item" onclick="openWallet()">
+          <div class="menu-icon wallet"><i class="fa-solid fa-wallet"></i></div>
+          <div class="menu-info"><div class="menu-name">Wallet</div><div class="menu-desc">Diamonds & balance</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="openBag()">
+          <div class="menu-icon bag"><i class="fa-solid fa-bag-shopping"></i></div>
+          <div class="menu-info"><div class="menu-name">My Bag</div><div class="menu-desc">Gifts & items collected</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="openUserControl()">
+          <div class="menu-icon control"><i class="fa-solid fa-sliders"></i></div>
+          <div class="menu-info"><div class="menu-name">User Control</div><div class="menu-desc">Privacy & preferences</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+      </div>
+
+      <div class="menu-title">Support</div>
+      <div class="menu-list">
+        <div class="menu-item" onclick="openHelp()">
+          <div class="menu-icon help"><i class="fa-solid fa-circle-question"></i></div>
+          <div class="menu-info"><div class="menu-name">Help & Support</div><div class="menu-desc">Get help or contact us</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="openRate()">
+          <div class="menu-icon bag"><i class="fa-solid fa-star"></i></div>
+          <div class="menu-info"><div class="menu-name">Rate MOI</div><div class="menu-desc">অ্যাপকে রেটিং দিন</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="openTerms()">
+          <div class="menu-icon help"><i class="fa-solid fa-file-contract"></i></div>
+          <div class="menu-info"><div class="menu-name">Terms & Privacy</div><div class="menu-desc">নিয়ম ও গোপনীয়তা নীতি</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="exportData()">
+          <div class="menu-icon control"><i class="fa-solid fa-download"></i></div>
+          <div class="menu-info"><div class="menu-name">Export My Data</div><div class="menu-desc">আপনার ডেটা JSON হিসেবে নামান</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+        <div class="menu-item" onclick="confirmLogout()">
+          <div class="menu-icon logout"><i class="fa-solid fa-right-from-bracket"></i></div>
+          <div class="menu-info"><div class="menu-name">Sign Out</div><div class="menu-desc">Log out from this account</div></div>
+          <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="version-text">MOI • Version 2.0.0</div>
+  </div>
+
+  <!-- ═══════════════ BOTTOM NAV ═══════════════ -->
+  <nav class="bottom-nav">
+    <a href="javascript:void(0)" class="nav-item" id="navRoom">
+      <span class="nav-icon"><i class="fa-solid fa-house"></i></span><span>Room</span>
+    </a>
+    <a href="javascript:void(0)" class="nav-item" id="navChat">
+      <span class="nav-icon"><i class="fa-solid fa-comment-dots"></i></span><span>Messages</span>
+    </a>
+    <a href="javascript:void(0)" class="nav-item active" id="navMe">
+      <span class="nav-icon"><i class="fa-solid fa-user"></i></span><span>Me</span>
+    </a>
+  </nav>
+
+</div>
+
+<input type="file" id="imageInput" accept="image/*" style="display:none">
+
+<div class="modal-overlay" id="cropModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">CROP PHOTO</div>
+      <div class="modal-close" onclick="closeCropModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div class="crop-box"><img id="imageToCrop" src=""></div>
+    <div class="crop-actions">
+      <button class="btn btn-cancel" onclick="closeCropModal()"><i class="fa-solid fa-xmark"></i> Cancel</button>
+      <button class="btn btn-primary" id="cropBtn"><i class="fa-solid fa-check"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="nameModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">CHANGE NAME</div>
+      <div class="modal-close" onclick="closeNameModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Display Name</label>
+      <input type="text" class="input-field" id="newNameInput" maxlength="24" placeholder="Enter your name...">
+      <div class="input-hint"><i class="fa-solid fa-circle-info"></i><span>Max 24 characters • Visible to everyone</span></div>
+    </div>
+    <div class="crop-actions">
+      <button class="btn btn-cancel" onclick="closeNameModal()"><i class="fa-solid fa-xmark"></i> Cancel</button>
+      <button class="btn btn-primary" id="saveNameBtn"><i class="fa-solid fa-check"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="svipModal">
+  <div class="modal-card svip-modal">
+    <div class="modal-head" style="border-bottom-color:rgba(var(--c3-rgb),.25)">
+      <div class="modal-title" style="background:linear-gradient(90deg,var(--c3),var(--c3),#ff9d00,var(--c3),var(--c3));background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">
+        <i class="fa-solid fa-crown" style="color:var(--c3);-webkit-text-fill-color:initial;margin-right:6px;filter:drop-shadow(0 0 8px rgba(var(--c3-rgb),.7))"></i> SVIP PRIVILEGE
+      </div>
+      <div class="modal-close" onclick="closeSvipModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div class="svip-hero">
+      <div class="svip-hero-title" id="svipHeroTitle"><i class="fa-solid fa-crown"></i> SVIP 1</div>
+      <div class="recharge-info">
+        <div class="recharge-label">
+          <span>Recharged</span>
+          <span class="coin"><i class="fa-solid fa-gem"></i> <span id="rechargeAmount">1,802,200</span></span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
+        <div class="progress-meta">
+          <span class="curr" id="currentLevelText">SVIP 1</span>
+          <span class="next" id="nextLevelText">→ SVIP 2 (1,397,800 more)</span>
+        </div>
+      </div>
+    </div>
+    <div class="svip-levels-label">Select Level</div>
+    <div class="svip-levels">
+      <div class="level-chip active" onclick="switchSvipLevel(1,'3.2M',1802200,1397800,42)">SVIP 1</div>
+      <div class="level-chip" onclick="switchSvipLevel(2,'11.2M',9397800,5000000,65)">SVIP 2</div>
+      <div class="level-chip" onclick="switchSvipLevel(3,'31.2M',25000000,10000000,71)">SVIP 3</div>
+      <div class="level-chip" onclick="switchSvipLevel(4,'91.2M',75000000,25000000,75)">SVIP 4</div>
+      <div class="level-chip" onclick="switchSvipLevel(5,'251.2M',180000000,70000000,72)">SVIP 5</div>
+      <div class="level-chip" onclick="switchSvipLevel(6,'480M',350000000,130000000,73)">SVIP 6</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">SETTINGS</div>
+      <div class="modal-close" onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div class="menu-list">
+      <div class="menu-item" onclick="openNotifications()">
+        <div class="menu-icon control"><i class="fa-solid fa-bell"></i></div>
+        <div class="menu-info"><div class="menu-name">Notifications</div><div class="menu-desc">Manage notification settings</div></div>
+        <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="openPrivacy()">
+        <div class="menu-icon help"><i class="fa-solid fa-lock"></i></div>
+        <div class="menu-info"><div class="menu-name">Privacy</div><div class="menu-desc">Control who can see you</div></div>
+        <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="MOI.openTheme()">
+        <div class="menu-icon wallet"><i class="fa-solid fa-palette"></i></div>
+        <div class="menu-info"><div class="menu-name">Theme</div><div class="menu-desc">৪টি কালার থিম</div></div>
+        <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="openLanguage()">
+        <div class="menu-icon bag"><i class="fa-solid fa-language"></i></div>
+        <div class="menu-info"><div class="menu-name">Language</div><div class="menu-desc">বাংলা / English</div></div>
+        <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="showAbout()">
+        <div class="menu-icon wallet"><i class="fa-solid fa-circle-info"></i></div>
+        <div class="menu-info"><div class="menu-name">About</div><div class="menu-desc">Version 2.0.0</div></div>
+        <div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="panelModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title" id="panelTitle"></div>
+      <div class="modal-close" onclick="closePanel()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div id="panelBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <i class="fa-solid fa-circle-check" id="toastIcon"></i>
+  <span id="toastText">Saved</span>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
+<script src="../shared/config.js"></script>
+<script src="../shared/core/firebase-init.js"></script>
+<script src="../shared/core/sync.js"></script>
+<script src="../shared/core/sync-routes.js"></script>
+<script src="../shared/storage.js"></script>
+<script src="../shared/core/economy.js"></script>
+<script src="../shared/core/db-storage.js"></script>
+<script src="../shared/core/auth.js"></script>
+<script src="../shared/features.js"></script>
+<script src="profile.js"></script>
+<script src="svip.js"></script>
+<script src="panels.js"></script>
+<script src="extra.js"></script>
+<script src="me.js"></script>
+</body>
+</html>
