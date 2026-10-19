@@ -1,1 +1,235 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<script src="../shared/theme.js"></script>
+<script src="../shared/fallback.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MOI — Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400..800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="login.css">
+<link rel="stylesheet" href="../shared/theme.css">
+</head>
+<body>
 
+
+<canvas id="fx"></canvas>
+<div class="aurora">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+</div>
+
+<div class="stage">
+  <div class="phone" id="phone">
+    <div class="frame-glow"></div>
+    <div class="screen">
+
+      <!-- ===== VIEW 1: LOGIN ===== -->
+      <div class="view" id="view-login">
+        <div class="top rise" style="animation-delay:.15s">
+          <h1 class="title">MOI</h1>
+          <div class="tagline">Connect · Play · Vibe</div>
+        </div>
+
+        <div class="mascot-wrap rise" style="animation-delay:.3s">
+          <svg class="mascot" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <radialGradient id="gHalo" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#00f2fe" stop-opacity=".55"/><stop offset="52%" stop-color="#8b5cf6" stop-opacity=".2"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient>
+              <radialGradient id="gEar" cx="38%" cy="28%" r="78%"><stop offset="0%" stop-color="#ffa3ce"/><stop offset="46%" stop-color="#ff2a85"/><stop offset="100%" stop-color="#9c0049"/></radialGradient>
+              <radialGradient id="gHead" cx="34%" cy="24%" r="82%"><stop offset="0%" stop-color="#ff93c8"/><stop offset="42%" stop-color="#ff2a85"/><stop offset="100%" stop-color="#94003f"/></radialGradient>
+              <radialGradient id="gFace" cx="42%" cy="28%" r="78%"><stop offset="0%" stop-color="#fff"/><stop offset="62%" stop-color="#ffe7f2"/><stop offset="100%" stop-color="#ffbcd8"/></radialGradient>
+              <linearGradient id="gVisor" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#17253f"/><stop offset="55%" stop-color="#060b17"/><stop offset="100%" stop-color="#0e1d36"/></linearGradient>
+              <linearGradient id="gBand" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a6fbff"/><stop offset="45%" stop-color="#00f2fe"/><stop offset="100%" stop-color="#008ba3"/></linearGradient>
+              <linearGradient id="gArm" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff6aa8"/><stop offset="100%" stop-color="#c70060"/></linearGradient>
+              <linearGradient id="gGloss" x1="0" y1="0" x2=".7" y2="1"><stop offset="0%" stop-color="#fff" stop-opacity=".55"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></linearGradient>
+              <filter id="fEye" x="-90%" y="-90%" width="280%" height="280%"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <circle cx="120" cy="122" r="114" fill="url(#gHalo)"/>
+            <ellipse class="orbit" cx="120" cy="122" rx="108" ry="32" fill="none" stroke="#00f2fe" stroke-width="1.2" stroke-dasharray="4 11" opacity=".5"/>
+            <circle cx="60" cy="66" r="27" fill="url(#gEar)"/><circle cx="60" cy="66" r="14" fill="#ffd3e6"/>
+            <circle cx="180" cy="66" r="27" fill="url(#gEar)"/><circle cx="180" cy="66" r="14" fill="#ffd3e6"/>
+            <circle cx="120" cy="126" r="78" fill="url(#gHead)"/>
+            <ellipse cx="92" cy="82" rx="34" ry="19" fill="url(#gGloss)" transform="rotate(-24 92 82)"/>
+            <ellipse cx="120" cy="144" rx="58" ry="46" fill="url(#gFace)"/>
+            <ellipse cx="76" cy="152" rx="10" ry="7" fill="#ff2a85" opacity=".32"/>
+            <ellipse cx="164" cy="152" rx="10" ry="7" fill="#ff2a85" opacity=".32"/>
+            <path d="M108 152 Q120 164 132 152" stroke="#7a2044" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <rect x="58" y="106" width="124" height="40" rx="20" fill="url(#gVisor)"/>
+            <rect x="58" y="106" width="124" height="40" rx="20" fill="none" stroke="#00f2fe" stroke-width="2" opacity=".85"/>
+            <g class="eyes"><ellipse cx="96" cy="126" rx="9" ry="11" fill="#7df9ff" filter="url(#fEye)"/><ellipse cx="144" cy="126" rx="9" ry="11" fill="#7df9ff" filter="url(#fEye)"/></g>
+            <rect class="scan" x="64" y="110" width="112" height="3" rx="1.5" fill="#ff2a85" opacity=".8"/>
+            <path d="M46 122 C40 44, 200 44, 194 122" stroke="url(#gBand)" stroke-width="11" stroke-linecap="round" fill="none"/>
+            <rect x="32" y="100" width="20" height="44" rx="10" fill="url(#gBand)"/>
+            <rect x="188" y="100" width="20" height="44" rx="10" fill="url(#gBand)"/>
+            <rect x="36" y="106" width="6" height="32" rx="3" fill="#fff" opacity=".4"/>
+            <rect x="192" y="106" width="6" height="32" rx="3" fill="#fff" opacity=".4"/>
+            <g class="arm"><path d="M166 172 Q208 170 214 130" stroke="url(#gArm)" stroke-width="22" stroke-linecap="round" fill="none"/>
+              <circle cx="214" cy="128" r="14" fill="#ffa3ce"/><circle cx="214" cy="128" r="14" fill="none" stroke="#ff2a85" stroke-width="2" opacity=".55"/>
+              <ellipse cx="209" cy="122" rx="5" ry="3.6" fill="#fff" opacity=".6"/></g>
+          </svg>
+        </div>
+
+        <div class="card rise" style="animation-delay:.45s">
+          <div class="divider">Login with</div>
+          <button class="btn btn-google" type="button" id="googleBtn">
+            <i class="fa-brands fa-google"></i><span>Continue with Google</span>
+          </button>
+          <button class="btn btn-phone" type="button" id="phoneBtn">
+            <i class="fa-solid fa-mobile-screen-button"></i><span>Continue with Phone</span>
+          </button>
+          <button class="btn btn-guest" type="button" id="guestBtn">
+            <i class="fa-solid fa-user-secret"></i><span>Continue as Guest</span>
+          </button>
+        </div>
+
+        <div class="bottom rise" style="animation-delay:.6s">
+          <div class="problems"><i class="fa-solid fa-circle-question"></i> Having problems?</div>
+          <div class="terms">Agree and Continue &nbsp;·&nbsp; <a href="#">Terms of Service</a> &amp; <a href="#">Privacy Policy</a></div>
+        </div>
+      </div>
+
+      <!-- ===== VIEW 2: PROFILE SETUP ===== -->
+      <div class="view hidden" id="view-profile">
+        <div>
+          <div class="p-title">SETUP PROFILE</div>
+          <div class="p-sub">Just a few more details</div>
+          <div class="avatar-wrap"><div class="avatar" id="profileAvatar"><i class="fa-solid fa-user"></i></div></div>
+          <div class="welcome-name" id="profileName">Guest</div>
+        </div>
+
+        <div class="profile-card">
+          <div class="form-group">
+            <label class="form-label">Your Country</label>
+            <div class="select-wrap">
+              <select id="countrySelect">
+                <option value="">— Select Country —</option>
+                <option value="Bangladesh">🇧🇩 Bangladesh</option>
+                <option value="India">🇮🇳 India</option>
+                <option value="Pakistan">🇵🇰 Pakistan</option>
+                <option value="Nepal">🇳🇵 Nepal</option>
+                <option value="Sri Lanka">🇱🇰 Sri Lanka</option>
+                <option value="Myanmar">🇲🇲 Myanmar</option>
+                <option value="Malaysia">🇲🇾 Malaysia</option>
+                <option value="Indonesia">🇮🇩 Indonesia</option>
+                <option value="Saudi Arabia">🇸🇦 Saudi Arabia</option>
+                <option value="UAE">🇦🇪 United Arab Emirates</option>
+                <option value="Qatar">🇶🇦 Qatar</option>
+                <option value="Kuwait">🇰🇼 Kuwait</option>
+                <option value="Turkey">🇹🇷 Turkey</option>
+                <option value="Egypt">🇪🇬 Egypt</option>
+                <option value="UK">🇬🇧 United Kingdom</option>
+                <option value="USA">🇺🇸 United States</option>
+                <option value="Canada">🇨🇦 Canada</option>
+                <option value="Germany">🇩🇪 Germany</option>
+                <option value="France">🇫🇷 France</option>
+                <option value="Italy">🇮🇹 Italy</option>
+                <option value="Spain">🇪🇸 Spain</option>
+                <option value="Russia">🇷🇺 Russia</option>
+                <option value="China">🇨🇳 China</option>
+                <option value="Japan">🇯🇵 Japan</option>
+                <option value="South Korea">🇰🇷 South Korea</option>
+                <option value="Philippines">🇵🇭 Philippines</option>
+                <option value="Thailand">🇹🇭 Thailand</option>
+                <option value="Vietnam">🇻🇳 Vietnam</option>
+                <option value="Brazil">🇧🇷 Brazil</option>
+                <option value="Mexico">🇲🇽 Mexico</option>
+                <option value="Australia">🇦🇺 Australia</option>
+                <option value="Other">🌍 Other</option>
+              </select>
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Voice Preference</label>
+            <div class="voice-row" id="voiceRow">
+              <button type="button" class="voice-btn" data-voice="Male"><i class="fa-solid fa-mars"></i>Male</button>
+              <button type="button" class="voice-btn" data-voice="Female"><i class="fa-solid fa-venus"></i>Female</button>
+              <button type="button" class="voice-btn" data-voice="Neutral"><i class="fa-solid fa-circle-half-stroke"></i>Neutral</button>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" type="button" id="saveProfileBtn">
+          <i class="fa-solid fa-arrow-right"></i><span>Continue</span>
+        </button>
+      </div>
+
+      <!-- ===== VIEW 4: PHONE OTP ===== -->
+      <div class="view hidden" id="view-phone">
+        <div>
+          <div class="p-title" id="phoneTitle">PHONE LOGIN</div>
+          <div class="p-sub" id="phoneSub">We'll send you a code</div>
+        </div>
+        <div class="profile-card">
+          <div id="phoneStep1">
+            <div class="form-group">
+              <label class="form-label">Mobile number</label>
+              <div class="phone-row">
+                <select id="phoneCc" aria-label="Country code">
+                  <option value="+880">🇧🇩 +880</option><option value="+91">🇮🇳 +91</option><option value="+92">🇵🇰 +92</option>
+                  <option value="+971">🇦🇪 +971</option><option value="+966">🇸🇦 +966</option><option value="+44">🇬🇧 +44</option>
+                  <option value="+1">🇺🇸 +1</option><option value="+81">🇯🇵 +81</option><option value="+82">🇰🇷 +82</option>
+                  <option value="+20">🇪🇬 +20</option><option value="+90">🇹🇷 +90</option>
+                </select>
+                <input type="tel" id="phoneNum" inputmode="numeric" maxlength="12" placeholder="1XXXXXXXXX" autocomplete="tel-national">
+              </div>
+            </div>
+            <div class="guest-note info"><i class="fa-solid fa-circle-info"></i><span>আপনার নম্বরে একটি ৬ ডিজিটের কোড SMS করে পাঠানো হবে।</span></div>
+          </div>
+          <div id="phoneStep2" style="display:none">
+            <div class="form-group">
+              <label class="form-label" id="otpLabel">Enter 6-digit code</label>
+              <div class="otp-row" id="otpRow">
+                <input class="otp-box" inputmode="numeric" maxlength="1" aria-label="digit 1"><input class="otp-box" inputmode="numeric" maxlength="1" aria-label="digit 2"><input class="otp-box" inputmode="numeric" maxlength="1" aria-label="digit 3"><input class="otp-box" inputmode="numeric" maxlength="1" aria-label="digit 4"><input class="otp-box" inputmode="numeric" maxlength="1" aria-label="digit 5"><input class="otp-box" inputmode="numeric" maxlength="1" aria-label="digit 6">
+              </div>
+            </div>
+            <div id="recaptcha-container"></div>
+            <div class="otp-resend"><span id="otpTimer"></span><button type="button" id="otpResend" disabled>Resend code</button></div>
+          </div>
+        </div>
+        <div>
+          <button class="btn btn-primary" type="button" id="phoneSubmit"><i class="fa-solid fa-paper-plane"></i><span id="phoneSubmitText">Send code</span></button>
+          <div class="guest-back" id="phoneBack"><i class="fa-solid fa-arrow-left"></i> Back to login</div>
+        </div>
+      </div>
+
+      <div class="uid-badge" id="uidBadge">
+        <span class="dot"></span>
+        <span class="lbl">MOI ID</span>
+        <span class="num" id="uidNum">------</span>
+      </div>
+
+      <div class="redirect-overlay" id="redirectOverlay">
+        <i class="fa-solid fa-circle-check check"></i>
+        <div class="txt">Success</div>
+        <div class="sub" id="redirectWho">আপনার Homepage-এ নিয়ে যাওয়া হচ্ছে…</div>
+        <div class="counter" id="redirectCounter"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
+<script src="../shared/config.js"></script>
+<script src="../shared/core/firebase-init.js"></script>
+<script src="../shared/core/sync.js"></script>
+<script src="../shared/core/sync-routes.js"></script>
+<script src="../shared/storage.js"></script>
+<script src="../shared/core/economy.js"></script>
+<script src="../shared/core/db-storage.js"></script>
+<script src="../shared/core/auth.js"></script>
+<script src="particles.js"></script>
+<script src="login.js"></script>
+</body>
+</html>
