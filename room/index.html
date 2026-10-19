@@ -1,1 +1,548 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<script src="../shared/theme.js"></script>
+<script src="../shared/fallback.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>HOUR FM</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400..800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="sheets.css">
+<link rel="stylesheet" href="modals.css">
+<link rel="stylesheet" href="features.css">
+<link rel="stylesheet" href="gifts.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+<link rel="stylesheet" href="../shared/theme.css">
+<link rel="stylesheet" href="../shared/features.css">
+<link rel="stylesheet" href="live.css">
+</head>
+<body>
+<div class="app-container">
 
+    <div class="room-wallpaper" id="roomWallpaper"></div>
+
+    <div class="role-flag" id="roleFlag"><i class="fa-solid fa-crown"></i> <span id="roleFlagText">OWNER</span></div>
+
+    <div class="top-bar">
+        <div class="room-info" onclick="toggleMemberModal()">
+            <div class="room-logo-circle" id="room-logo-preview"><span class="cassette-text">HOUR<br>FM</span></div>
+            <div class="room-text">
+                <div class="room-title-row">
+                    <div class="room-title-top"><span id="room-name-display">Loading…</span><i class="fa-solid fa-music"></i></div>
+                    <div class="join-btn" id="joinRoomBtn" onclick="event.stopPropagation();toggleJoinRoom()">
+                        <i class="fa-solid fa-plus"></i><span id="joinBtnText">Join</span>
+                    </div>
+                </div>
+                <div class="room-points-row">
+                    <div class="room-points"><i class="fa-solid fa-trophy trophy"></i><i class="fa-solid fa-gem gem"></i><span id="roomPointsVal">0</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="top-right">
+            <div class="listener-group" onclick="toggleListenersModal()">
+                <div class="listener-avatar-stack" id="my-avatar-wrap"><img src="" alt="User" class="listener-avatar" id="my-avatar-top"></div>
+                <div class="listener-count" id="userCountBadge">0</div>
+            </div>
+            <div class="settings-btn" id="settingsBtn" onclick="openSettingsMenu()"><i class="fa-solid fa-gear"></i></div>
+            <div class="exit-wrapper">
+                <div class="exit-btn" onclick="toggleExitMenu(event)"><i class="fa-solid fa-right-from-bracket"></i></div>
+                <div class="exit-menu" id="exitMenu">
+                    <button class="exit-menu-btn keep" onclick="keepRoom()">
+                        <i class="fa-solid fa-arrow-down-left-and-arrow-up-right-to-center"></i>
+                        <span>Keep</span>
+                    </button>
+                    <button class="exit-menu-btn leave" onclick="exitRoom()">
+                        <i class="fa-solid fa-xmark"></i>
+                        <span>Exit</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pk-banner" id="pkBanner">
+        <div class="pk-banner-top">
+            <div class="pk-banner-side">
+                <img id="pkBannerBlueImg" src="">
+                <span class="name" id="pkBannerBlueName">মহাজ</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+                <div class="pk-timer-box">
+                    <span class="txt" id="pkTimerText">PK 10:00</span>
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+                <div class="pk-power-btn" onclick="pkEnd(true)" style="position:static"><i class="fa-solid fa-power-off"></i></div>
+            </div>
+            <div class="pk-banner-side">
+                <span class="name" id="pkBannerRedName">পূর্ণিমা</span>
+                <img id="pkBannerRedImg" src="">
+            </div>
+        </div>
+        <div class="pk-tug-bar">
+            <div class="pk-tug-blue" id="pkTugBlue" style="width:50%"></div>
+            <div class="pk-tug-red" id="pkTugRed" style="width:50%"></div>
+            <div class="pk-white-line" id="pkWhiteLine" style="left:50%"></div>
+        </div>
+    </div>
+
+    <div class="top-gifters-row" onclick="openGifterLeaderboard()">
+        <span class="tg-label"><i class="fa-solid fa-crown"></i> TOP</span>
+        <div class="tg-avatars" id="topGiftersAvatars"></div>
+        <i class="fa-solid fa-chevron-right tg-arrow"></i>
+    </div>
+
+    <div class="seats-grid" id="seatsGrid"></div>
+
+    <div class="music-player-bar" id="musicPlayerBar">
+        <div class="mp-close-btn" onclick="mpClosePlayer()"><i class="fa-solid fa-xmark"></i></div>
+        <div class="mp-vinyl" id="mpVinyl"><div class="mp-vinyl-center"></div></div>
+        <div class="mp-controls">
+            <div class="mp-btn" onclick="mpPrev()"><i class="fa-solid fa-backward-step"></i></div>
+            <div class="mp-btn play-btn" onclick="mpTogglePlay()"><i class="fa-solid fa-play" id="mpPlayIcon"></i></div>
+            <div class="mp-btn" onclick="mpNext()"><i class="fa-solid fa-forward-step"></i></div>
+        </div>
+        <div class="mp-track-info">
+            <div class="mp-track-name" id="mpTrackName">No song</div>
+            <div class="mp-progress-bar"><div class="mp-progress-fill" id="mpProgressFill"></div></div>
+        </div>
+        <div class="mp-btn" id="mpLoopBtn" onclick="mpToggleLoop()"><i class="fa-solid fa-repeat"></i></div>
+        <div class="mp-btn vol-btn" onclick="mpToggleVolume()"><i class="fa-solid fa-volume-high" id="mpVolIcon"></i></div>
+    </div>
+
+    <div class="message-feed" id="messageFeed">
+        <div class="topic-row"><div class="topic-text" id="topicText">🎧FM 📻➡️SP ✨🎤Room 🎵</div><i class="fa-solid fa-pen topic-edit" onclick="editTopic()"></i></div>
+        <div class="messages-list" id="messagesList"></div>
+    </div>
+
+    <div class="activity-strip" id="activityStrip"></div>
+
+    <div class="bottom-bar">
+        <div class="bottom-icon" onclick="openChatSheet()"><i class="fa-solid fa-comment-dots"></i></div>
+        <div class="bottom-icon" onclick="openEmojiSheet()"><i class="fa-solid fa-face-smile"></i></div>
+        <div class="bottom-icon" onclick="openMessageInput()"><i class="fa-solid fa-paper-plane"></i></div>
+        <div class="bottom-icon" id="micToggleBtn" onclick="toggleMyMicFromBar()"><i class="fa-solid fa-microphone"></i></div>
+        <div class="bottom-icon gift-btn" onclick="openGiftPanel()"><i class="fa-solid fa-gift"></i></div>
+        <div class="bottom-icon" onclick="openGameSheet()"><i class="fa-solid fa-gamepad"></i></div>
+    </div>
+
+    <div class="yellow-glow"></div>
+    <div class="toast-msg" id="toastBox"></div>
+
+    <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
+
+    <div class="bottom-sheet" id="seatSheet">
+        <div class="sheet-title" id="sheetTitle">Seat</div>
+        <div id="sheetOptions"></div>
+        <div class="sheet-cancel" onclick="closeSheet()">Cancel</div>
+    </div>
+
+    <div class="bottom-sheet" id="settingsSheet">
+        <div class="settings-header">
+            <h3><i class="fa-solid fa-gear"></i> Room Menu</h3>
+            <div class="st-close" onclick="closeSheet()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="settings-section-lbl">Atmosphere</div>
+        <div class="settings-grid">
+            <div class="settings-item" onclick="openLuckyBoxSheet()"><div class="si-icon"><i class="fa-solid fa-box-open"></i></div><div class="si-label">Lucky Box</div></div>
+            <div class="settings-item" onclick="openPKSetup()"><div class="si-icon"><i class="fa-solid fa-shield-halved"></i></div><div class="si-label">PK</div></div>
+            <div class="settings-item" onclick="openMusicPanel()"><div class="si-icon"><i class="fa-solid fa-music"></i></div><div class="si-label">Music</div></div>
+            <div class="settings-item" onclick="openRoomTheme()"><div class="si-icon"><i class="fa-solid fa-palette"></i></div><div class="si-label">Room Theme</div></div>
+            <div class="settings-item active-feature" onclick="openWallpaperPicker()"><div class="si-icon"><i class="fa-solid fa-image"></i></div><div class="si-label">Room Wallpaper</div></div>
+            <div class="settings-item" onclick="settingsNotReady('Sound')"><div class="si-icon"><i class="fa-solid fa-volume-high"></i></div><div class="si-label">Sound</div></div>
+            <div class="settings-item" onclick="settingsNotReady('Administrator')"><div class="si-icon"><i class="fa-solid fa-user-tie"></i></div><div class="si-label">Administrator</div></div>
+            <div class="settings-item" onclick="settingsNotReady('Blacklist')"><div class="si-icon"><i class="fa-solid fa-user-slash"></i></div><div class="si-label">Blacklist</div></div>
+            <div class="settings-item" onclick="settingsNotReady('Party Mode')"><div class="si-icon"><i class="fa-solid fa-champagne-glasses"></i></div><div class="si-label">Party Mode</div></div>
+        </div>
+    </div>
+
+    <input type="file" id="wallpaperInput" accept="image/*" style="display:none" onchange="handleWallpaperSelect(event)">
+
+    <div class="bottom-sheet" id="gifterSheet">
+        <div class="gifter-header">
+            <div class="gifter-header-row">
+                <div class="gh-left">
+                    <div class="gh-icon"><i class="fa-solid fa-crown"></i></div>
+                    <div class="gh-info">
+                        <div class="gh-title">Top Gifters</div>
+                        <div class="gh-sub" id="gifterSub">গত ১ দিনে সবচেয়ে বেশি গিফট পেয়েছেন</div>
+                    </div>
+                </div>
+                <div class="gh-close" onclick="closeSheet()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            <div class="gifter-time-tabs">
+                <button class="time-chip active" id="timeDay" onclick="setGifterRange('day')"><i class="fa-solid fa-sun"></i> 1 Day</button>
+                <button class="time-chip" id="timeMonth" onclick="setGifterRange('month')"><i class="fa-solid fa-calendar"></i> 1 Month</button>
+            </div>
+        </div>
+        <div class="gifter-body" id="gifterBody"></div>
+    </div>
+
+    <div class="bottom-sheet" id="emojiSheet">
+        <div class="emoji-panel-header"><h3><i class="fa-solid fa-face-smile"></i> Reactions</h3><div class="ep-close" onclick="closeSheet()"><i class="fa-solid fa-xmark"></i></div></div>
+        <div class="emoji-categories" id="emojiCategories"></div>
+        <div class="emoji-grid" id="emojiGrid"></div>
+    </div>
+
+    <!-- ⚠️ পুরনো giftPickerSheet সরানো হয়েছে -->
+
+    <div class="bottom-sheet iframe-sheet" id="chatSheet">
+        <div class="drag-handle" id="chatDragHandle"></div>
+        <div class="iframe-header">
+            <h3><i class="fa-solid fa-comments"></i> Messages</h3>
+            <div class="if-actions">
+                <div class="if-action" onclick="toggleIframeFullscreen('chatSheet')"><i class="fa-solid fa-expand"></i></div>
+                <div class="if-action" onclick="closeSheet()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+        </div>
+        <div class="iframe-body">
+            <div class="iframe-loading" id="chatLoading"><div class="iframe-spinner"></div><div>Chat লোড হচ্ছে...</div></div>
+            <iframe id="chatFrame" allow="microphone;camera;clipboard-read;clipboard-write;autoplay;fullscreen"></iframe>
+        </div>
+    </div>
+
+    <div class="bottom-sheet iframe-sheet" id="gameSheet">
+        <div class="drag-handle" id="gameDragHandle"></div>
+        <div class="iframe-header">
+            <h3><i class="fa-solid fa-gamepad"></i> Games</h3>
+            <div class="if-actions">
+                <div class="if-action" onclick="toggleIframeFullscreen('gameSheet')"><i class="fa-solid fa-expand"></i></div>
+                <div class="if-action" onclick="closeSheet()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+        </div>
+        <div class="iframe-body">
+            <div class="iframe-loading" id="gameLoading"><div class="iframe-spinner"></div><div>Game লোড হচ্ছে...</div></div>
+            <iframe id="gameFrame" allow="microphone;camera;clipboard-read;clipboard-write;autoplay;fullscreen"></iframe>
+        </div>
+    </div>
+
+    <div class="bottom-sheet" id="msgSheet">
+        <div class="sheet-title">Send message to room</div>
+        <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Type your message..." maxlength="200" onkeydown="if(event.key==='Enter'){event.preventDefault();sendChatMessage();}">
+            <button class="chat-send-btn" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <div class="bottom-sheet" id="luckyBoxSheet">
+        <div class="lucky-header">
+            <div class="lucky-header-left">
+                <div class="lucky-icon-box"><i class="fa-solid fa-box-open"></i></div>
+                <h3>Lucky Box</h3>
+            </div>
+            <div class="lucky-help" onclick="toastMsg('🎁 টাইমার, ডায়মন্ড ও কোয়ান্টিটি সেট করে Send চাপুন')">?</div>
+            <div class="gh-close" onclick="closeSheet()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="lucky-body">
+            <div class="lucky-section">
+                <div class="lucky-label">Countdown:</div>
+                <div class="lucky-options" id="luckyTimer">
+                    <button class="lucky-chip active" data-v="0">0 min</button>
+                    <button class="lucky-chip" data-v="3">3 min</button>
+                    <button class="lucky-chip" data-v="5">5 min</button>
+                </div>
+            </div>
+            <div class="lucky-section">
+                <div class="lucky-label">Diamonds:</div>
+                <div class="lucky-options" id="luckyDiamonds">
+                    <button class="lucky-chip" data-v="10">10</button>
+                    <button class="lucky-chip" data-v="20">20</button>
+                    <button class="lucky-chip" data-v="30">30</button>
+                    <button class="lucky-chip" data-v="50">50</button>
+                    <button class="lucky-chip active" data-v="100">100</button>
+                </div>
+            </div>
+            <div class="lucky-section">
+                <div class="lucky-label">Quantity:</div>
+                <div class="lucky-options" id="luckyQuantity">
+                    <button class="lucky-chip active" data-v="3">3</button>
+                    <button class="lucky-chip" data-v="5">5</button>
+                    <button class="lucky-chip" data-v="10">10</button>
+                    <button class="lucky-chip" data-v="20">20</button>
+                </div>
+            </div>
+            <div class="lucky-balance">Gold balance: <span id="luckyBalance">0</span> 💎</div>
+            <button class="lucky-send" onclick="sendLuckyBox()">🎁 Send</button>
+        </div>
+    </div>
+
+    <div id="permissionSheet">
+        <div class="perm-header">
+            <img src="" alt="" class="perm-avatar" id="permAvatar">
+            <div class="perm-name" id="permName">—</div>
+            <i class="fa-solid fa-circle-info perm-info" onclick="openCurrentProfileFromSheet()"></i>
+        </div>
+        <div class="perm-section-title">Permission</div>
+        <div class="perm-options">
+            <div class="perm-option" id="optAdmin" onclick="setPermissionRole('admin')"><i class="fa-solid fa-user perm-icon"></i><span class="perm-label">Admin</span><i class="fa-solid fa-check perm-check"></i></div>
+            <div class="perm-option" id="optMember" onclick="setPermissionRole('member')"><i class="fa-solid fa-user perm-icon"></i><span class="perm-label">User</span><i class="fa-solid fa-check perm-check"></i></div>
+        </div>
+        <div class="perm-remove-btn" onclick="removeUserFromRoom()"><i class="fa-solid fa-user-minus"></i><span>Remove from member</span></div>
+        <div class="perm-cancel" onclick="closePermissionSheet()">Cancel</div>
+    </div>
+
+    <div class="modal-overlay" id="listenersModal">
+        <div class="modal-header"><h3>Online Listeners (<span id="listenerTotalCount">0</span>)</h3><i class="fa-solid fa-xmark close-btn" onclick="closeModal('listenersModal')"></i></div>
+        <div class="user-list" id="listenerList"></div>
+    </div>
+
+    <div class="modal-overlay" id="memberModal">
+        <div class="modal-header"><h3>Room Info</h3><i class="fa-solid fa-xmark close-btn" onclick="closeModal('memberModal')"></i></div>
+        <div class="room-modal-top">
+            <div class="room-logo-modal" id="room-logo-modal-container" onclick="openEditRoom()"><span class="cassette-text">HOUR<br>FM</span></div>
+            <div class="room-title-modal" id="room-name-modal-display">Loading…</div>
+            <div class="room-id-modal" id="room-id-modal">ID:---</div>
+            <div class="owner-info-modal" id="owner-info-modal"></div>
+        </div>
+        <div class="member-title">Member</div>
+        <div class="search-bar"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="memberSearch" placeholder="নাম খুঁজুন" oninput="renderMembers()"><i class="fa-solid fa-xmark" style="font-size:12px;cursor:pointer" onclick="clearSearch()"></i></div>
+        <div class="member-counter" id="memberCounter">0/4000</div>
+        <div class="user-list" id="userList"></div>
+    </div>
+
+    <div class="modal-overlay" id="editRoomModal">
+        <div class="edit-profile-box">
+            <div class="modal-header"><h3>Edit Room Profile</h3><i class="fa-solid fa-xmark close-btn" onclick="closeModal('editRoomModal')"></i></div>
+            <div class="edit-avatar-wrap">
+                <div class="edit-avatar-container" onclick="document.getElementById('roomImageUpload').click()">
+                    <div id="room-logo-edit-preview" style="width:100%;height:100%;display:flex;justify-content:center;align-items:center"><span class="cassette-text">HOUR<br>FM</span></div>
+                </div>
+                <div class="edit-avatar-overlay" onclick="document.getElementById('roomImageUpload').click()"><i class="fa-solid fa-camera"></i></div>
+            </div>
+            <input type="file" id="roomImageUpload" accept="image/*" style="display:none" onchange="previewRoomImage(event)">
+            <div class="input-group"><label>Room Name</label><input type="text" id="roomNameInput" maxlength="24"></div>
+            <div class="input-group"><label>Room ID</label><input type="text" id="roomIdInput" disabled style="opacity:.5"></div>
+            <button class="save-btn" onclick="saveRoomProfile()">Save Changes</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="cropModal">
+        <div class="crop-wrap">
+            <div class="modal-header"><h3>ছবি ক্রপ করুন</h3><i class="fa-solid fa-xmark close-btn" onclick="cancelCrop()"></i></div>
+            <div class="crop-image-box"><img id="cropImage" alt=""></div>
+            <div class="crop-actions"><button class="crop-cancel" onclick="cancelCrop()">বাতিল</button><button class="crop-confirm" onclick="applyCrop()">ক্রপ করুন</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="userProfileModal">
+        <div class="profile-top-bar"><i class="fa-solid fa-arrow-left" onclick="closeUserProfile()"></i><span class="profile-at">@</span><i class="fa-solid fa-ellipsis" onclick="openProfileMoreSheet()"></i></div>
+        <div class="profile-cover"><img src="" alt="" id="profileCover"></div>
+        <div class="profile-avatar-wrap"><img src="" alt="" class="profile-avatar" id="profileAvatar"></div>
+        <div class="profile-info">
+            <div class="profile-name" id="profileName">—</div>
+            <div class="profile-uid" id="profileUid">UID: —</div>
+            <div class="profile-follow-row">
+                <div class="profile-followers" onclick="openFollowList('followers')"><i class="fa-regular fa-star"></i><span id="profileFollowers">0</span><span style="font-weight:500;color:var(--c2);margin-left:2px">Followers</span></div>
+                <div class="profile-following" onclick="openFollowList('following')"><i class="fa-solid fa-user-group"></i><span id="profileFollowing">0</span><span style="font-weight:500;color:var(--c1s);margin-left:2px">Following</span></div>
+            </div>
+        </div>
+        <div class="profile-actions">
+            <button class="profile-btn follow-btn" id="profileFollowBtn" onclick="toggleFollowCurrent()"><i class="fa-solid fa-plus"></i><span>Follow</span></button>
+            <button class="profile-btn chat-btn" onclick="profileChatNow()"><i class="fa-solid fa-comment-dots"></i><span>Message</span></button>
+            <button class="profile-btn gift-btn-p" onclick="profileGiftCurrent()"><i class="fa-solid fa-gift"></i></button>
+        </div>
+        <div class="profile-bottom-bar" id="profileBottomBar">
+            <div class="pbar-icon warn" id="pbarMute" onclick="profileMute()"><i class="fa-solid fa-microphone-slash"></i></div>
+            <div class="pbar-sep" id="pbarSep1"></div>
+            <div class="pbar-icon cyan" id="pbarLeave" onclick="profileLeave()"><i class="fa-solid fa-arrow-down"></i></div>
+            <div class="pbar-sep" id="pbarSep2"></div>
+            <div class="pbar-icon danger" id="pbarKick" onclick="profileKick()"><i class="fa-solid fa-right-from-bracket"></i></div>
+        </div>
+    </div>
+
+    <div id="followListModal">
+        <div class="fl-header">
+            <div class="fl-back" onclick="closeFollowList()"><i class="fa-solid fa-arrow-left"></i></div>
+            <div class="fl-title" id="flTitle">Followers</div>
+        </div>
+        <div class="fl-body" id="flBody"></div>
+    </div>
+
+    <div class="pk-setup-panel" id="pkSetupPanel">
+        <div class="pk-setup-header">
+            <div class="close-btn" onclick="closePKSetup()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="pk-setup-title"><i class="fa-solid fa-hand-fist"></i> 1vs1 PK</div>
+        <div class="pk-vs-container">
+            <div class="pk-team-slot">
+                <div class="pk-avatar-circle" id="pkBlueSlot"><i class="fa-solid fa-user" style="color:#555"></i></div>
+                <div class="pk-team-name" id="pkBlueName">খালি</div>
+                <div class="pk-team-uid" id="pkBlueUid">UID: ---</div>
+            </div>
+            <div class="pk-vs-badge">VS</div>
+            <div class="pk-team-slot">
+                <div class="pk-avatar-circle" id="pkRedSlot"><i class="fa-solid fa-user" style="color:#555"></i></div>
+                <div class="pk-team-name" id="pkRedName">খালি</div>
+                <div class="pk-team-uid" id="pkRedUid">UID: ---</div>
+            </div>
+        </div>
+        <div class="pk-select-area">
+            <div class="pk-select-title" id="pkSelectTitle">নীল সদস্য নির্বাচন করুন</div>
+            <div class="pk-member-list" id="pkMemberList"></div>
+        </div>
+        <div class="pk-time-row" onclick="openPKTimeSheet()">
+            <span>সময়</span>
+            <span class="time-val" id="pkTimeVal">১০ মিনিট <i class="fa-solid fa-chevron-right"></i></span>
+        </div>
+        <button class="pk-start-btn" id="pkStartBtn" disabled onclick="pkStart()">
+            <i class="fa-solid fa-check"></i> পিকে শুরু করুন
+        </button>
+    </div>
+
+    <div class="pk-time-sheet" id="pkTimeSheet">
+        <div class="pk-time-sheet-inner">
+            <h3>PK Time</h3>
+            <div class="pk-time-option" id="pkOpt5" onclick="pkSetTime(5)">৫ মিনিট</div>
+            <div class="pk-time-option active" id="pkOpt10" onclick="pkSetTime(10)">১০ মিনিট</div>
+            <div class="pk-time-option" id="pkOpt15" onclick="pkSetTime(15)">১৫ মিনিট</div>
+            <button class="pk-time-confirm" onclick="closePKTimeSheet()"><i class="fa-solid fa-check"></i></button>
+        </div>
+    </div>
+
+    <div class="pk-splash" id="pkSplash">
+        <div class="pk-splash-content">
+            <i class="fa-solid fa-fire pk-splash-fire" style="left:20%;color:var(--c2)"></i>
+            <i class="fa-solid fa-fire pk-splash-fire" style="right:20%;color:var(--c1)"></i>
+            <img class="pk-splash-av blue" id="pkSplashBlueImg" src="">
+            <div class="pk-splash-vs">VS</div>
+            <img class="pk-splash-av red" id="pkSplashRedImg" src="">
+        </div>
+    </div>
+
+    <div class="rt-panel" id="rtPanel">
+        <div class="rt-header">
+            <div class="rt-back" onclick="closeRoomTheme()"><i class="fa-solid fa-chevron-left"></i></div>
+            <div class="rt-tabs">
+                <div class="rt-tab active" onclick="rtSwitchTab('quantity')">Quantity</div>
+                <div class="rt-tab" onclick="rtSwitchTab('skin')">Skin</div>
+            </div>
+        </div>
+        <div class="rt-body" id="rtBody"></div>
+    </div>
+
+    <div class="rt-confirm-popup" id="rtConfirmPopup">
+        <div class="rt-confirm-box">
+            <i class="fa-solid fa-xmark cp-x" onclick="rtCloseConfirm()"></i>
+            <div class="rt-confirm-title">Use Mic Seat</div>
+            <div class="rt-confirm-text">Fewer mic seats may unseat some users and reset their heart points. Switch?</div>
+            <button class="rt-confirm-btn" onclick="rtConfirmChange()">Confirm</button>
+            <button class="rt-cancel-btn" onclick="rtCloseConfirm()">Cancel</button>
+        </div>
+    </div>
+
+    <div class="music-select-panel" id="musicSelectPanel">
+        <div class="music-select-header">
+            <h3><i class="fa-solid fa-music"></i> Select Song</h3>
+            <div class="music-select-close" onclick="closeMusicPanel()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="music-file-list" id="musicFileList"></div>
+    </div>
+
+    <!-- ═══════════ 🆕 GIFT PANEL ═══════════ -->
+    <div class="gift-panel" id="giftPanel">
+
+        <div class="gp-status">
+            <div class="gp-avatar">M</div>
+            <div class="gp-user">
+                <div class="gp-level">
+                    <span>Non-Noble</span>
+                    <span style="color:var(--c3)">+100</span>
+                    <i class="fa-solid fa-chevron-right" style="font-size:8px;opacity:.6"></i>
+                </div>
+                <div class="gp-progress">
+                    <div class="gp-progress-fill"></div>
+                </div>
+                <div class="gp-user-pts">100</div>
+            </div>
+            <div class="gp-balance">
+                <i class="fa-solid fa-gem dia"></i>
+                <span id="giftBalance">0</span>
+            </div>
+            <div class="gp-cart">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+        </div>
+
+        <div class="gp-tabs">
+            <button class="gp-tab active" data-cat="hot" onclick="switchGiftCat('hot')">গরম</button>
+            <button class="gp-tab" data-cat="recent" onclick="switchGiftCat('recent')">সাম্প্রতিক</button>
+            <button class="gp-tab" data-cat="activity" onclick="switchGiftCat('activity')">এক্টিভিটি</button>
+            <button class="gp-tab" data-cat="svip" onclick="switchGiftCat('svip')">SVIP</button>
+        </div>
+
+        <div class="gp-grid" id="giftGrid"></div>
+
+        <div class="gp-actions">
+            <div class="gp-target" id="giftTargetBox" onclick="toggleGiftTargetDropdown(event)">
+                <div class="gp-target-avatars" id="giftTargetAvatars"></div>
+                <span class="gp-target-name" id="giftTargetName">—</span>
+                <span class="gp-target-count" id="giftTargetCount" style="display:none">+2</span>
+                <span class="gp-combo" id="giftComboBox">❤️+<span id="giftComboCount">0</span></span>
+
+                <div class="gift-target-dropdown" id="giftTargetDropdown" onclick="event.stopPropagation()">
+                    <div class="gtd-header">
+                        <span>সবগুলো নির্বাচন করুন</span>
+                        <span class="gtd-all" id="giftSelectAllBtn" onclick="toggleGiftSelectAll(event)">Select All</span>
+                    </div>
+                    <div id="giftTdList"></div>
+                </div>
+            </div>
+
+            <div class="gp-qty" id="giftQtyBox" onclick="toggleGiftQtyDropdown(event)">
+                <span id="giftQtyVal">1</span>
+                <i class="fa-solid fa-chevron-down" style="font-size:9px;opacity:.6"></i>
+                <div class="gift-qty-dropdown" id="giftQtyDropdown" onclick="event.stopPropagation()"></div>
+            </div>
+
+            <button class="gp-send" id="giftSendBtn" onclick="sendGift()">পাঠান</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ═══════════ 🆕 GIFT ANIMATION LAYER ═══════════ -->
+<div class="gift-anim-layer" id="giftAnimLayer"></div>
+
+<!-- ═══════════ 🆕 COMBO RESEND BUTTON ═══════════ -->
+<div class="gift-combo-resend" id="giftComboResend" onclick="resendGift()">
+    <svg class="gift-combo-ring" viewBox="0 0 64 64">
+        <circle class="gift-combo-ring-bg" cx="32" cy="32" r="26"/>
+        <circle class="gift-combo-ring-fill" cx="32" cy="32" r="26" id="giftComboRingFill"/>
+    </svg>
+    <button class="gift-combo-btn" type="button">
+        <i class="fa-solid fa-gift"></i>
+    </button>
+    <span class="gift-combo-badge" id="giftComboTimer">6</span>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
+<script src="../shared/core/firebase-init.js"></script>
+<script src="../shared/core/sync.js"></script>
+<script src="../shared/core/sync-routes.js"></script>
+<script src="../shared/core/economy.js"></script>
+<script src="../shared/core/db-storage.js"></script>
+<script src="config.js"></script>
+<script src="../shared/core/auth.js"></script>
+<script src="data.js"></script>
+<script src="lottie.js"></script>
+<script src="render.js"></script>
+<script src="actions.js"></script>
+<script src="ui.js"></script>
+<script src="gifts.js"></script>
+<script src="luckybox.js"></script>
+<script src="pk.js"></script>
+<script src="music.js"></script>
+<script src="theme.js"></script>
+<script src="../shared/features.js"></script>
+<script src="main.js"></script>
+<script src="live.js"></script>
+</body>
+</html>
