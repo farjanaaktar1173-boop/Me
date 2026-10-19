@@ -1,0 +1,62 @@
+/* shared/theme.css — MOI ডিজাইন টোকেন (৪টি থিম) + সবার জন্য সাধারণ পলিশ */
+:root,:root[data-theme="golden"]{--mute:#a89fbd;--mute2:#7d7498;--mute3:#c3bbd8;--tx:#f4eefb;
+  --c1:#ff5f7e;--c1-rgb:255,95,126;--c2:#ffb25a;--c2-rgb:255,178,90;--c3:#ffe3b8;--c3-rgb:255,227,184;
+  --c1s:#ffc2cf;--c1s-rgb:255,194,207;--c2d:#c97a2b;--c2d-rgb:201,122,43;
+  --bg0:#0f0818;--bg0-rgb:15,8,24;--bg1:#170d2a;--bg1-rgb:23,13,42;--bg2:#21163a;--bg2-rgb:33,22,58;--bg3:#2b1d4b;--bg3-rgb:43,29,75;
+  --on:#1a0b12;--on-rgb:26,11,18;--live:#3de8c0;--grad-brand:linear-gradient(135deg,var(--c1),var(--c2));
+}
+:root[data-theme="lagoon"]{--mute:#7fa3a6;--mute2:#5d868a;--mute3:#9dc3c4;--tx:#eaf6f6;
+  --c1:#20e3b2;--c1-rgb:32,227,178;--c2:#00d9ff;--c2-rgb:0,217,255;--c3:#d6fff3;--c3-rgb:214,255,243;
+  --c1s:#a9f5de;--c1s-rgb:169,245,222;--c2d:#0e9fb8;--c2d-rgb:14,159,184;
+  --bg0:#031215;--bg0-rgb:3,18,21;--bg1:#061c21;--bg1-rgb:6,28,33;--bg2:#0a272d;--bg2-rgb:10,39,45;--bg3:#0d3037;--bg3-rgb:13,48,55;
+  --on:#031215;--on-rgb:3,18,21;--live:#7dffa1;
+}
+:root[data-theme="orchid"]{--mute:#a99bd0;--mute2:#7f70a8;--mute3:#c5b8e6;--tx:#f3ecff;
+  --c1:#b45cff;--c1-rgb:180,92,255;--c2:#ff6bd6;--c2-rgb:255,107,214;--c3:#f6d6ff;--c3-rgb:246,214,255;
+  --c1s:#dcb8ff;--c1s-rgb:220,184,255;--c2d:#b0309a;--c2d-rgb:176,48,154;
+  --bg0:#0d0618;--bg0-rgb:13,6,24;--bg1:#150a2a;--bg1-rgb:21,10,42;--bg2:#1f1040;--bg2-rgb:31,16,64;--bg3:#2a1857;--bg3-rgb:42,24,87;
+  --on:#12061f;--on-rgb:18,6,31;--live:#7dffd0;
+}
+:root[data-theme="royal"]{--mute:#a89f8c;--mute2:#7d7566;--mute3:#c4bba6;--tx:#fbf3e2;
+  --c1:#f0b429;--c1-rgb:240,180,41;--c2:#ff8a3d;--c2-rgb:255,138,61;--c3:#fff1c9;--c3-rgb:255,241,201;
+  --c1s:#ffe29a;--c1s-rgb:255,226,154;--c2d:#a8641a;--c2d-rgb:168,100,26;
+  --bg0:#0b0907;--bg0-rgb:11,9,7;--bg1:#14110c;--bg1-rgb:20,17,12;--bg2:#1e1912;--bg2-rgb:30,25,18;--bg3:#2a2318;--bg3-rgb:42,35,24;
+  --on:#1a1205;--on-rgb:26,18,5;--live:#8dffb0;
+}
+
+html{background:var(--bg0);-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{font-family:'Figtree','Hind Siliguri','Noto Sans Bengali',system-ui,-apple-system,'Segoe UI',sans-serif;font-optical-sizing:auto}
+button,input,select,textarea{font-family:inherit}
+::selection{background:rgba(var(--c1-rgb),.35);color:#fff}
+img{image-rendering:auto}
+:focus-visible{outline:2px solid var(--c2);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* বড় স্ক্রিনে (ডেস্কটপ/4K) চারপাশে আলোর আভা */
+@media (min-width:720px){
+  html{background:
+    radial-gradient(900px 600px at 15% 10%,rgba(var(--c1-rgb),.16),transparent 60%),
+    radial-gradient(900px 600px at 90% 90%,rgba(var(--c2-rgb),.14),transparent 60%),
+    var(--bg0)}
+}
+@media (min-width:1600px){ html{font-size:17px} }
+
+/* ═══ নতুন কম্পোনেন্ট বেস (features.js এর জন্য) ═══ */
+.mx-overlay{position:fixed;inset:0;z-index:3000;background:rgba(var(--bg0-rgb),.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:flex-end;justify-content:center}
+.mx-overlay.show{display:flex;animation:mxFade .22s ease}
+@keyframes mxFade{from{opacity:0}to{opacity:1}}
+.mx-sheet{width:100%;max-width:430px;max-height:92vh;overflow-y:auto;border-radius:28px 28px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(var(--bg3-rgb),.98),rgba(var(--bg1-rgb),.99));border:1px solid rgba(var(--c2-rgb),.28);border-bottom:none;
+  box-shadow:0 -20px 70px rgba(0,0,0,.6),0 0 60px rgba(var(--c1-rgb),.12);animation:mxUp .32s cubic-bezier(.2,.9,.25,1);color:#fff;font-family:inherit}
+@keyframes mxUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.mx-grab{width:42px;height:4px;border-radius:4px;background:rgba(255,255,255,.22);margin:2px auto 14px}
+.mx-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.mx-title{font-family:'Bricolage Grotesque','Figtree',sans-serif;font-weight:800;font-size:20px;letter-spacing:-.01em}
+.mx-x{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;display:grid;place-items:center;cursor:pointer;font-size:14px}
+.mx-btn{border:none;border-radius:14px;padding:13px 18px;font:700 14px/1 inherit;font-family:inherit;color:var(--on);background:var(--grad-brand);cursor:pointer;box-shadow:0 8px 24px rgba(var(--c1-rgb),.38);transition:transform .15s}
+.mx-btn:active{transform:scale(.96)}
+.mx-btn.ghost{background:rgba(255,255,255,.07);color:#fff;box-shadow:none;border:1px solid rgba(255,255,255,.12)}
+.mx-btn:disabled{opacity:.45;box-shadow:none;cursor:default}
+.mx-muted{color:rgba(255,255,255,.62);font-size:12.5px}
+.mx-card{border-radius:18px;padding:14px;background:rgba(255,255,255,.05);border:1px solid rgba(var(--c2-rgb),.18)}
+.mx-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;background:rgba(var(--c1-rgb),.16);color:var(--c1s);border:1px solid rgba(var(--c1-rgb),.3)}
