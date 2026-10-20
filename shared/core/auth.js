@@ -27,3 +27,148 @@ console.log('[MOI] auth.js loaded');
             myRoomUid: p.myRoomUid || ''
         }));
     }
+
+    function startPresence(uid){
+        if (presenceStarted) return; presenceStarted = true;
+        const ref = FB.rtdb.ref(LIVE + '/presence/' + uid);
+        FB.rtdb.ref('.info/connected').on('value', s => {
+            if (s.val() !== true) return;
+            ref.onDisconnect().update({ online: false, lastSeen: FB.RTS() });
+            ref.update({ online: true, lastSeen: FB.RTS() });
+        });
+        const tick = () => FB.db.collection('users').doc(uid).update({ lastSeen: FB.TS() }).catch(() => {});
+        tick(); setInterval(tick, 120000);
+    }
+
+    function bootstrap(u){
+        const id = u ? u.uid : null;
+        if (boot && bootUid === id) return boot;
+        bootUid = id; boot = doBootstrap(u);
+        return boot;
+    }
+    /* Cloud Functions (Blaze) ছাড়া চালাতে: প্রোফাইল ডক সরাসরি Firestore-এ বানানো (Firestore রুল খোলা থাকতে হবে) */
+    async function clientEnsureProfile(u){
+        const db = FB.db, FV = firebase.firestore.FieldValue;
+        const isGuest = !!u.isAnonymous;
+        const ref = db.collection('users').doc(u.uid);
+        for (let i = 0; i < 8; i++){
+            const moiId = String(100000 + Math.floor(Math.random() * 900000));
+            const idRef = db.collection('moiIds').doc(moiId);
+            try {
+                await db.runTransaction(async t => {
+                    const s = await t.get(ref);
+                    if (s.exists) return;
+                    const idSnap = await t.get(idRef);
+                    if (idSnap.exists) throw new Error('ID_TAKEN');
+                    t.set(idRef, { uid: u.uid });
+                    t.set(ref, {
+                        uid: u.uid, moiId,
+                        name: (u.displayName || '').replace(/[<>]/g, '').trim().slice(0, 24) || (isGuest ? 'Guest ' : 'User ') + moiId.slice(-4),
+                        photo: u.photoURL || 'https://api.dicebear.com/7.x/adventurer/svg?seed=' + encodeURIComponent(u.uid),
+                        bio: '', country: '', gender: '', birthday: '', voice: '',
+                        role: isGuest ? 'guest' : 'user', isGuest,
+                        badges: [], crown: '', ownedCrowns: [], frame: 'basic',
+                        diamonds: 0, level: 1, xp: 0, giftsSent: 0, giftsReceived: 0,
+                        myRoomUid: '', myRoomId: '', distributorId: null,
+                        isBanned: false, banReason: null, banExpiresAt: null,
+                        profileComplete: false,
+                        createdAt: FV.serverTimestamp(), lastSeen: FV.serverTimestamp(), lastActiveRoomId: ''
+                    });
+                });
+                return;
+            } catch(e){ if (!e || e.message !== 'ID_TAKEN') throw e; }
+        }
+        throw new Error('MOI ID বানানো যায়নি, আবার চেষ্টা করুন');
+    }
+
+    async function doBootstrap(u){
+        if (!u){
+            S.stop(); presenceStarted = false; lastDia = lastXp = null;
+            dropUser();
+            resolveFirst(null); return null;
+        }
+        /* ১) প্রোফাইল ডক আছে কিনা — না থাকলে সার্ভার বানাবে (moiId সহ) */
+        let snap = null;
+        try { snap = await FB.db.collection('users').doc(u.uid).get(); } catch(e){}
+        if (!snap || !snap.exists){
+            try { await MOIEco.call('ensureProfile', { name: u.displayName || '', photo: u.photoURL || '' }); }
+            catch(e){ console.warn('[auth] ensureProfile ফাংশন নেই — ক্লায়েন্ট থেকে প্রোফাইল বানানো হচ্ছে', e); await clientEnsureProfile(u); }
+        }
+        /* ২) লাইভ সিঙ্ক চালু */
+        await S.start(u.uid, ['moi_demo_users', 'moi_demo_rooms']);
+        S.startKV();
+        const p = profileOf(u.uid);
+        if (p && p.isBanned){ await MOIAuth.signOut(true); throw Object.assign(new Error('BANNED'), { code: 'BANNED', profile: p }); }
+        writeSession(p, u);
+        if (p){ lastDia = p.diamonds; lastXp = p.xp; }
+        startPresence(u.uid);
+        S.watch('moi_notifs_' + u.uid);
+        resolveFirst(u);
+        return p;
+    }
+
+    /* ইউজার ডক বদলালে সেশন ও UI আপডেট */
+    window.addEventListener('moi:sync', e => {
+        if (!e.detail || e.detail.key !== 'moi_demo_users') return;
+        const u = FB.auth.currentUser; if (!u) return;
+        const p = profileOf(u.uid); if (!p) return;
+        if (p.isBanned){ MOIAuth.signOut(true); return; }
+        writeSession(p, u);
+        if (lastDia !== null && p.diamonds !== lastDia){ lastDia = p.diamonds; window.dispatchEvent(new CustomEvent('moi:diamonds', { detail: { balance: p.diamonds } })); }
+        if (lastXp !== null && p.xp !== lastXp){ lastXp = p.xp; window.dispatchEvent(new CustomEvent('moi:xp')); }
+    });
+
+    const MOIAuth = {
+        ready: first,                                  /* প্রথম অবস্থা জানা গেলে (ইউজার বা null) */
+        get user(){ return FB && FB.auth.currentUser; },
+        get profile(){ return this.user ? profileOf(this.user.uid) : null; },
+        get role(){ const p = this.profile; return (p && p.role) || (this.user && this.user.isAnonymous ? 'guest' : 'user'); },
+        get isGuest(){ return !this.user || this.user.isAnonymous || this.role === 'guest'; },
+        panelFor: role => PANEL[role] || null,
+        /* লগইন সম্পন্ন হয়ে প্রোফাইল লোড না হওয়া পর্যন্ত অপেক্ষা */
+        async whenReady(){
+            const u = FB.auth.currentUser; if (!u) return null;
+            return bootstrap(u);
+        },
+        /* পেজ গার্ড: লগইন না থাকলে লগইনে পাঠায় */
+        async require(){
+            const u = await first;
+            if (!u){ location.replace(LOGIN_URL); return new Promise(() => {}); }
+            return u;
+        },
+        async google(){
+            const prov = new firebase.auth.GoogleAuthProvider();
+            try { await FB.auth.signInWithPopup(prov); }
+            catch(e){
+                if (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment'){ await FB.auth.signInWithRedirect(prov); return; }
+                throw e;
+            }
+            return this.whenReady();
+        },
+        async guest(){ await FB.auth.signInAnonymously(); return this.whenReady(); },
+        /* Phone OTP: ১) phoneStart  ২) phoneConfirm */
+        async phoneStart(e164, containerId){
+            if (this._verifier){ try { this._verifier.clear(); } catch(e){} }
+            this._verifier = new firebase.auth.RecaptchaVerifier(containerId, { size: 'invisible' });
+            this._confirm = await FB.auth.signInWithPhoneNumber(e164, this._verifier);
+            return true;
+        },
+        async phoneConfirm(code){
+            if (!this._confirm) throw new Error('আগে কোড পাঠান');
+            await this._confirm.confirm(code);
+            return this.whenReady();
+        },
+        async signOut(silent){
+            try { const u = FB.auth.currentUser; if (u) await FB.rtdb.ref(LIVE + '/presence/' + u.uid).update({ online: false, lastSeen: FB.RTS() }); } catch(e){}
+            S.stop(); dropUser();
+            await FB.auth.signOut();
+            if (!silent) location.href = LOGIN_URL;
+        }
+    };
+    window.MOIAuth = MOIAuth;
+    window.MOIReady = first;
+
+    if (FB){
+        FB.auth.onAuthStateChanged(u => { bootstrap(u).catch(err => { console.error('[auth] bootstrap', err); resolveFirst(null); }); });
+    } else resolveFirst(null);
+})();
