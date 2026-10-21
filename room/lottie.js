@@ -1,124 +1,48 @@
-/* room/lottie.js — আগুনের রিং animation (Lottie) */
+/* room/lottie.js — প্রতিটা ইউজারের পরা মুকুট (Lottie) সিট ও প্রোফাইলের ছবির চারপাশে
+   মুকুটের আসল কোড shared/features.js এ (MOI.crownAttachUser) — এখানে শুধু রুমের কোন কোন ছবিতে বসবে সেটা ঠিক করা।
+   ফাইল: moi/crowns/*.json • যার মুকুট নেই তার ছবিতে কিছু বসে না। */
 
 console.log('[ROOM] lottie.js loaded');
 
-let _lottieData = null;
-let _lottieDataPromise = null;
-let _ringInstances = [];
+const _crownApi = () => (window.MOI && MOI.crownAttachUser) ? MOI : null;
 
-/* ═══ Lottie ডেটা লোড ═══ */
-async function loadLottieData(){
-    if (_lottieData) return _lottieData;
-    if (_lottieDataPromise) return _lottieDataPromise;
+/* ═══ DOM থেকে মুছে যাওয়া ছবির অ্যানিমেশন বন্ধ ═══ */
+function destroyAllRings(){ const m = _crownApi(); if (m) m.crownPrune(); }
 
-    _lottieDataPromise = fetch('fire_ring.json')
-        .then(r => r.ok ? r.json() : Promise.reject('HTTP ' + r.status))
-        .then(json => { _lottieData = json; return json; })
-        .catch(err => {
-            console.warn('[Lottie] load failed:', err);
-            _lottieDataPromise = null;
-            return null;
-        });
-    return _lottieDataPromise;
+/* ═══ একটা host এর মুকুট মুছে ফেলা ═══ */
+function destroyRingsFor(hostEl){ const m = _crownApi(); if (m) m.crownDestroy(hostEl); }
+
+/* ═══ একটা host এ ইউজারের মুকুট বসানো ═══ */
+function attachRing(hostEl, uid){
+    const m = _crownApi(); if (!m || !hostEl) return null;
+    const id = uid || (myProfile && myProfile.uid);
+    return m.crownAttachUser(hostEl, getUser(id));
 }
 
-/* ═══ একটা host এর রিং মুছে ফেলা ═══ */
-function destroyRingsFor(hostEl){
-    _ringInstances = _ringInstances.filter(inst => {
-        if (inst.hostEl === hostEl){
-            try { inst.anim.destroy(); } catch(e){}
-            return false;
-        }
-        return true;
-    });
-}
-
-/* ═══ সব রিং মুছে ফেলা ═══ */
-function destroyAllRings(){
-    _ringInstances.forEach(inst => { try { inst.anim.destroy(); } catch(e){} });
-    _ringInstances = [];
-    document.querySelectorAll('.lottie-ring').forEach(el => el.remove());
-}
-
-/* ═══ একটা host এ রিং যোগ ═══ */
-async function attachRing(hostEl){
-    if (!hostEl || !window.lottie) return null;
-    destroyRingsFor(hostEl);
-
-    const old = hostEl.querySelector(':scope > .lottie-ring');
-    if (old) old.remove();
-
-    const ring = document.createElement('div');
-    ring.className = 'lottie-ring';
-    hostEl.appendChild(ring);
-
-    const data = await loadLottieData();
-    if (!data){ ring.remove(); return null; }
-
-    try {
-        const anim = window.lottie.loadAnimation({
-            container: ring,
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            animationData: JSON.parse(JSON.stringify(data))
-        });
-        _ringInstances.push({ hostEl, anim, ringEl: ring });
-        return anim;
-    } catch(e){
-        console.warn('[Lottie] render failed:', e);
-        ring.remove();
-        return null;
-    }
-}
-
-/* ═══ সব জায়গায় রিং refresh ═══ */
+/* ═══ সব জায়গায় মুকুট refresh (একই মুকুট হলে অ্যানিমেশন নতুন করে শুরু হয় না) ═══ */
 function refreshAllRings(){
-    if (!myProfile || !window.lottie) return;
-    destroyAllRings();
-    const targets = [];
-
-    /* top bar এর avatar */
-    const topWrap = $('my-avatar-wrap');
-    if (topWrap) targets.push(topWrap);
+    const m = _crownApi(); if (!m || !myProfile) return;
+    m.crownPrune();
 
     /* প্রতিটা seat */
     document.querySelectorAll('.seat').forEach(seatEl => {
         const idx = +seatEl.dataset.seat;
         const s = state.seats[idx];
-        if (s && s.uid){
-            const av = seatEl.querySelector('.seat-avatar');
-            if (av) targets.push(av);
-        }
-    });
-
-    /* listeners modal এ */
-    document.querySelectorAll('.listener-user-card').forEach(card => {
-        const av = card.querySelector('.listener-user-avatar');
-        if (av) targets.push(av);
-    });
-
-    /* members modal এ */
-    document.querySelectorAll('.user-card').forEach(card => {
-        const av = card.querySelector('.user-avatar-box');
-        if (av) targets.push(av);
+        const av = seatEl.querySelector('.seat-avatar');
+        if (!av) return;
+        if (s && s.uid) attachRing(av, s.uid); else destroyRingsFor(av);
     });
 
     /* profile modal এ */
     const profModal = $('userProfileModal');
-    if (profModal && profModal.classList.contains('active')){
+    if (profModal && profModal.classList.contains('active') && typeof currentProfileUid !== 'undefined' && currentProfileUid){
         const wrap = document.querySelector('.profile-avatar-wrap');
-        if (wrap) targets.push(wrap);
+        if (wrap) attachRing(wrap, currentProfileUid);
     }
-
-    targets.forEach(el => attachRing(el));
 }
 
-/* ═══ শুধু top bar ring refresh ═══ */
-async function refreshTopBarRing(){
-    const wrap = $('my-avatar-wrap');
-    if (wrap) await attachRing(wrap);
-}
+/* আগের কোডের সাথে মিল রাখতে (এখন উপরের বারে মুকুট বসে না) */
+async function refreshTopBarRing(){ }
 
 window.destroyAllRings = destroyAllRings;
 window.destroyRingsFor = destroyRingsFor;
