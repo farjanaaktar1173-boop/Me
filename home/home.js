@@ -138,7 +138,7 @@ function initNav(){
         initModal();
         initNav();
         initFeatures();
-        initPanelLink();
+        /* প্যানেল বাটন এখন Me পেজে */
 
         setNavActive('room');
 
