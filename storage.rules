@@ -1,22 +1,14 @@
 rules_version = '2';
+/* MOI — Storage Rules (ধাপ ১): লগইন করা সবাই পড়তে পারবে; শুধু ছবি/ভিডিও/অডিও ও সাইজ সীমার ভিতরে লিখতে পারবে */
 service firebase.storage {
   match /b/{bucket}/o {
-    function isImage() { return request.resource.contentType.matches('image/.*'); }
-    match /users/{uid}/{file} {
+    match /{allPaths=**} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == uid && isImage() && request.resource.size < 3 * 1024 * 1024;
+      allow write: if request.auth != null
+        && request.resource.size < 15 * 1024 * 1024
+        && (request.resource.contentType.matches('image/.*')
+            || request.resource.contentType.matches('video/.*')
+            || request.resource.contentType.matches('audio/.*'));
     }
-    match /rooms/{roomId}/{file=**} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && isImage() && request.resource.size < 5 * 1024 * 1024
-        && (firestore.get(/databases/(default)/documents/rooms/$(roomId)).data.ownerUid == request.auth.uid
-            || request.auth.uid in firestore.get(/databases/(default)/documents/rooms/$(roomId)).data.admins);
-    }
-    match /chat/{chatId}/{file} {
-      allow read: if request.auth != null && request.auth.uid in chatId.split('__');
-      allow write: if request.auth != null && request.auth.uid in chatId.split('__') && request.resource.size < 15 * 1024 * 1024
-        && (request.resource.contentType.matches('image/.*') || request.resource.contentType.matches('video/.*') || request.resource.contentType.matches('audio/.*'));
-    }
-    match /{all=**} { allow read: if request.auth != null; allow write: if false; }
   }
 }
