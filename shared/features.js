@@ -339,37 +339,114 @@ function openStore(){
     sheet('Store', `<div class="mx-bal"><span>আপনার ব্যালেন্স</span><b>💎 ${fmt(m.diamonds)}</b></div>
         <div class="mx-sec">অবতার ফ্রেম</div><div class="mx-frames">${cards}</div>
         <div class="mx-sec">মুকুট</div><div class="mx-frames">${crownCards(m)}</div>
-        <p class="mx-muted center" style="margin-top:12px">ফ্রেম Me, Home ও রুমে আপনার ছবির চারপাশে দেখাবে।</p>`);
+        <p class="mx-muted center" style="margin-top:12px">ফ্রেম Me, Home ও রুমে আপনার ছবির চারপাশে দেখাবে। মুকুট কিনলে ব্যাগে যাবে — Me → My Bag থেকে Use করুন।</p>`);
+    setTimeout(mountCrownPreviews, 0);
 }
-/* ═══════════════ মুকুট ═══════════════ */
+/* ═══════════════ মুকুট (Lottie) ═══════════════
+   ফাইল: moi/crowns/<file>.json • দাম সার্ভারে (functions/catalog.js) — এখানকার দাম শুধু দেখানোর জন্য, দুই জায়গায় একই রাখুন।
+   কেনা = ব্যাগে যায় • ব্যাগের Use বাটনে পরা হয় • পরা মুকুট সবার কাছে ছবির চারপাশে দেখায়। */
+const CROWN_BASE = (() => { const s = [...document.scripts].find(x => /shared\/features\.js/.test(x.src || '')); return s ? s.src.replace(/shared\/features\.js.*$/, 'crowns/') : '../crowns/'; })();
+const CROWN_SCALE = 1.72;   /* মুকুটের আকার = ছবির ১.৭২ গুণ (Lottie ক্যানভাসে ছবির গোল অংশ প্রায় ৫৮%) — বড়/ছোট করতে এই সংখ্যা বদলান */
 const CROWN_LIST = [
-    { id:'bronze',  name:'Bronze',  price:2000,  emoji:'🥉', buy:true },
-    { id:'silver',  name:'Silver',  price:5000,  emoji:'🥈', buy:true },
-    { id:'gold',    name:'Gold',    price:10000, emoji:'🥇', buy:true },
-    { id:'diamond', name:'Diamond', price:25000, emoji:'💎', buy:true },
-    { id:'royal',   name:'Royal',   price:0,     emoji:'👑', buy:false }
+    { id:'crown_gold',     name:'Gold Crown',     price:500,  file:'crown_gold.json' },
+    { id:'royal_red',      name:'Royal Red',      price:600,  file:'royal_red.json' },
+    { id:'royal_green',    name:'Royal Green',    price:700,  file:'royal_green.json' },
+    { id:'royal_purple',   name:'Royal Purple',   price:800,  file:'royal_purple.json' },
+    { id:'lion_vip',       name:'Lion VIP',       price:900,  file:'lion_vip.json' },
+    { id:'dragon_vip',     name:'Dragon VIP',     price:1000, file:'dragon_vip.json' },
+    { id:'crystal_shield', name:'Crystal Shield', price:1100, file:'crystal_shield.json' },
+    { id:'ocean_pearl',    name:'Ocean Pearl',    price:1200, file:'ocean_pearl.json' }
 ];
+const OFFICIAL_CROWN = { id:'official', name:'Official Dragon', price:0, file:'official.json', official:true };
+const crownById = id => id === 'official' ? OFFICIAL_CROWN : (CROWN_LIST.find(c => c.id === id) || null);
+
+/* ইউজার এখন কোন মুকুট পরে আছে (না থাকলে null). Developer এর ডিফল্ট = official */
+function effectiveCrown(u){
+    if (!u) return null;
+    const c = u.crown;
+    if (c === 'none') return null;
+    if (c === 'official' || !c) return u.role === 'developer' ? OFFICIAL_CROWN : null;
+    return (u.ownedCrowns || []).includes(c) ? crownById(c) : null;
+}
+
+let _lottieP = null;
+function lottieLib(){
+    if (window.lottie) return Promise.resolve(window.lottie);
+    if (_lottieP) return _lottieP;
+    _lottieP = new Promise(res => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js';
+        s.onload = () => res(window.lottie || null);
+        s.onerror = () => { _lottieP = null; res(null); };
+        document.head.appendChild(s);
+    });
+    return _lottieP;
+}
+const _crownData = {};
+function crownData(c){
+    if (!_crownData[c.id]) _crownData[c.id] = fetch(CROWN_BASE + c.file).then(r => r.ok ? r.json() : Promise.reject(r.status)).catch(() => { delete _crownData[c.id]; return null; });
+    return _crownData[c.id];
+}
+const _crownHosts = new Set();
+function crownDestroy(host){
+    if (!host) return;
+    if (host._crownAnim){ try { host._crownAnim.destroy(); } catch(e){} host._crownAnim = null; }
+    const old = host.querySelector(':scope > .moi-crown-ring'); if (old) old.remove();
+    host._crownId = ''; _crownHosts.delete(host);
+}
+/* DOM থেকে মুছে যাওয়া ছবির অ্যানিমেশন বন্ধ (ল্যাগ ঠেকাতে) */
+function crownPrune(){ _crownHosts.forEach(h => { if (!h.isConnected) crownDestroy(h); }); }
+async function crownAttach(host, crown, scale){
+    if (!host) return null;
+    if (!crown){ crownDestroy(host); return null; }
+    if (host._crownId === crown.id && host.querySelector(':scope > .moi-crown-ring')) return host._crownAnim || null;
+    crownDestroy(host);
+    if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+    host._crownId = crown.id; _crownHosts.add(host);
+    const ring = document.createElement('div'); ring.className = 'moi-crown-ring';
+    ring.style.width = ring.style.height = Math.round((scale || CROWN_SCALE) * 100) + '%';
+    host.appendChild(ring);
+    const [lib, data] = await Promise.all([lottieLib(), crownData(crown)]);
+    if (host._crownId !== crown.id || !ring.isConnected) return null;
+    if (!lib || !data){ ring.remove(); host._crownId = ''; return null; }
+    try {
+        const anim = lib.loadAnimation({ container: ring, renderer: 'svg', loop: true, autoplay: true, animationData: JSON.parse(JSON.stringify(data)) });
+        host._crownAnim = anim; return anim;
+    } catch(e){ ring.remove(); host._crownId = ''; return null; }
+}
+const crownAttachUser = (host, user, scale) => crownAttach(host, effectiveCrown(user), scale);
+/* Store/ব্যাগের প্রিভিউ: data-crown-stage="<id>" ওয়ালা সব এলিমেন্টে অ্যানিমেশন বসায় */
+function mountCrownPreviews(root){
+    crownPrune();
+    (root || document).querySelectorAll('[data-crown-stage]').forEach(el => { const c = crownById(el.getAttribute('data-crown-stage')); if (c) crownAttach(el, c); });
+}
+
 function crownCards(m){
     const owned = m.ownedCrowns || [];
     return CROWN_LIST.map(c => {
-        const has = owned.includes(c.id), eq = m.crown === c.id;
-        const label = eq ? 'Equipped' : has ? 'Equip' : c.buy ? (c.price + ' 💎') : 'Event only';
-        return `<div class="mx-frame ${eq ? 'eq' : ''}"><div class="mx-frame-prev" style="font-size:38px">${c.emoji}</div><b>${c.name}</b>
-            <button class="mx-btn sm ${has ? 'ghost' : ''}" ${(eq || (!has && !c.buy)) ? 'disabled' : ''} onclick="MOI.crown('${c.id}')">${label}</button></div>`;
+        const has = owned.includes(c.id);
+        return `<div class="mx-frame mx-crown-card">
+            <div class="mx-crown-stage" data-crown-stage="${c.id}"><img src="${esc(m.photo || FALLBACK)}" alt="" onerror="this.src='${FALLBACK}'"></div>
+            <b>${esc(c.name)}</b>
+            <button class="mx-btn sm ${has ? 'ghost' : ''}" ${has ? 'disabled' : ''} onclick="MOI.crown('${c.id}')">${has ? 'Owned ✓' : (c.price + ' 💎')}</button></div>`;
     }).join('');
 }
+/* কেনা — শুধু ব্যাগে যায় */
 async function crown(id){
     const m = me(), c = CROWN_LIST.find(x => x.id === id); if (!m || !c) return;
-    const has = (m.ownedCrowns || []).includes(id);
-    if (!has){
-        if ((m.diamonds || 0) < c.price){ toast('পর্যাপ্ত ডায়মন্ড নেই', '💎'); return; }
-        const r = await eco('buyCrown', { id }); if (!r) return;
-        toast(c.name + ' মুকুট কেনা হয়েছে', '👑'); confetti();
-    } else {
-        const r = await eco('equipCrown', { id }); if (!r) return;
-        toast(c.name + ' মুকুট পরা হয়েছে', '👑');
-    }
-    setTimeout(openStore, 350);
+    if ((m.ownedCrowns || []).includes(id)){ toast('এই মুকুট আপনার ব্যাগে আছে', '👑'); return; }
+    if ((m.diamonds || 0) < c.price){ toast('পর্যাপ্ত ডায়মন্ড নেই', '💎'); return; }
+    const r = await eco('buyCrown', { id }); if (!r) return;
+    toast(c.name + ' কেনা হয়েছে — Me → My Bag থেকে Use করুন', '👑'); confetti();
+    setTimeout(openStore, 600);
+}
+/* পরা (ব্যাগের Use) — id '' দিলে খুলে ফেলা */
+async function useCrown(id){
+    const m = me(); if (!m) return false;
+    const r = await eco('equipCrown', { id: id || '' }); if (!r) return false;
+    const want = (r && typeof r.crown === 'string') ? r.crown : (id || '');
+    for (let i = 0; i < 20; i++){ const cur = me(); if (cur && (cur.crown || '') === want) break; await new Promise(res => setTimeout(res, 150)); }
+    return true;
 }
 /* ইউজারের পরিচয়-চিহ্ন (রোল, মুকুট, অফিসিয়াল ব্যাজ) — সব পেজে একই */
 const ROLE_CHIP = { developer:['DEV','#ff4d6d'], superadmin:['SUPER ADMIN','#f5b301'], distributor:['DISTRIBUTOR','#22c55e'], admin:['ADMIN','#38bdf8'], vip:['VIP','#c084fc'] };
@@ -377,7 +454,6 @@ const BADGE_ICON = { official_host:'🎙️', top_gifter:'🎁', verified:'✅',
 function identityHTML(u){
     if (!u) return '';
     let h = '';
-    const c = CROWN_LIST.find(x => x.id === u.crown); if (c) h += `<span title="${c.name} Crown">${c.emoji}</span>`;
     const r = ROLE_CHIP[u.role]; if (r) h += `<span style="background:${r[1]};color:#111;font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px;margin:0 3px;letter-spacing:.04em">${r[0]}</span>`;
     (u.badges || []).forEach(b => { if (BADGE_ICON[b]) h += `<span title="${b}">${BADGE_ICON[b]}</span>`; });
     return h;
@@ -564,7 +640,7 @@ function bindBell(el){
 window.MOI = {
     me, saveMe, toast, sheet, close: closeSheet, copy, confetti, esc, fmt, G, S, K,
     addDiamonds, addXP, stat, levelInfo, notify, unread, bindBell, refreshBells, onFollowed, badgeCheck,
-    openCheckin, claimCheckin, openSpin, doSpin, openLeaderboard, openStore, crown, identityHTML, openBadges, openTheme, openShare, openInvite, openNotifs,
+    openCheckin, claimCheckin, openSpin, doSpin, openLeaderboard, openStore, crown, useCrown, identityHTML, CROWN_LIST, crownById, effectiveCrown, crownAttach, crownAttachUser, crownDestroy, crownPrune, mountCrownPreviews, openBadges, openTheme, openShare, openInvite, openNotifs,
     lb: t => openLeaderboard(t), lbRange: r => { _lbRange = r; openLeaderboard(); },
     frame, theme, redeem, nativeShare, downloadCard, readAll, clearNotifs,
     FRAMES, BADGES, checkinState, spinState, frameState,
