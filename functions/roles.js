@@ -102,7 +102,7 @@ exports.grantBadge = callable(async (data, uid) => {
 });
 exports.grantCrown = callable(async (data, uid) => {
     const target = await findUser(data.target); const id = String(data.id || '');
-    if (!C.CROWNS[id]) fail('invalid-argument', 'INVALID');
+    if (!C.CROWNS[id] || C.CROWNS[id].officialOnly) fail('invalid-argument', 'INVALID');
     const me = await getUserDoc(uid); if (me.role !== 'developer') fail('permission-denied', 'PERMISSION_DENIED');
     await userRef(target).update({ ownedCrowns: data.on === false ? FV.arrayRemove(id) : FV.arrayUnion(id) });
     return { ok: true };

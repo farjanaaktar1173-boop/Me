@@ -10,13 +10,19 @@ exports.CHAT_GIFTS = { 10: 10, 50: 50, 100: 100, 500: 500, 1000: 1000 };
 /* প্রোফাইল ফ্রেম */
 exports.FRAMES = { basic: 0, aurora: 500, flame: 1200, ocean: 2000, royal: 3500, galaxy: 6000 };
 
-/* মুকুট — adminOnly হলে শুধু Developer দিতে পারবে */
+/* মুকুট — Lottie অ্যানিমেশন (ফাইল: moi/crowns/<file>)
+   price = 💎 দাম (সার্ভারই সত্য; ক্লায়েন্টের shared/features.js এর CROWN_LIST এ একই দাম রাখুন)
+   official = শুধু Developer রোল পায় (কেনা যায় না, দেওয়া যায় না) */
 exports.CROWNS = {
-    bronze:  { name: 'Bronze Crown',  price: 2000,  rarity: 'common',    purchasable: true,  giftable: true,  adminOnly: false },
-    silver:  { name: 'Silver Crown',  price: 5000,  rarity: 'common',    purchasable: true,  giftable: true,  adminOnly: false },
-    gold:    { name: 'Gold Crown',    price: 10000, rarity: 'rare',      purchasable: true,  giftable: true,  adminOnly: false },
-    diamond: { name: 'Diamond Crown', price: 25000, rarity: 'legendary', purchasable: true,  giftable: true,  adminOnly: false },
-    royal:   { name: 'Royal Crown',   price: 0,     rarity: 'event',     purchasable: false, giftable: false, adminOnly: true }
+    crown_gold:     { name: 'Gold Crown',     price: 500,  rarity: 'common',    purchasable: true,  giftable: true,  adminOnly: false, file: 'crown_gold.json' },
+    royal_red:      { name: 'Royal Red',      price: 600,  rarity: 'common',    purchasable: true,  giftable: true,  adminOnly: false, file: 'royal_red.json' },
+    royal_green:    { name: 'Royal Green',    price: 700,  rarity: 'common',    purchasable: true,  giftable: true,  adminOnly: false, file: 'royal_green.json' },
+    royal_purple:   { name: 'Royal Purple',   price: 800,  rarity: 'rare',      purchasable: true,  giftable: true,  adminOnly: false, file: 'royal_purple.json' },
+    lion_vip:       { name: 'Lion VIP',       price: 900,  rarity: 'rare',      purchasable: true,  giftable: true,  adminOnly: false, file: 'lion_vip.json' },
+    dragon_vip:     { name: 'Dragon VIP',     price: 1000, rarity: 'rare',      purchasable: true,  giftable: true,  adminOnly: false, file: 'dragon_vip.json' },
+    crystal_shield: { name: 'Crystal Shield', price: 1100, rarity: 'legendary', purchasable: true,  giftable: true,  adminOnly: false, file: 'crystal_shield.json' },
+    ocean_pearl:    { name: 'Ocean Pearl',    price: 1200, rarity: 'legendary', purchasable: true,  giftable: true,  adminOnly: false, file: 'ocean_pearl.json' },
+    official:       { name: 'Official Dragon', price: 0,   rarity: 'official',  purchasable: false, giftable: false, adminOnly: true, officialOnly: true, file: 'official.json' }
 };
 
 /* অফিসিয়াল ব্যাজ (Developer দেয়) */

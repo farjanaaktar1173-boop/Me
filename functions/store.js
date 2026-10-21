@@ -27,7 +27,7 @@ exports.buyFrame = callable(async (data, uid) => {
     });
 });
 
-/* মুকুট কেনা */
+/* মুকুট কেনা — শুধু ব্যাগে যায়; পরতে হলে equipCrown (ব্যাগের Use বাটন) */
 exports.buyCrown = callable(async (data, uid) => {
     const id = String(data.id || ''); const c = C.CROWNS[id];
     if (!c || !c.purchasable || c.adminOnly) fail('invalid-argument', 'INVALID');
@@ -36,19 +36,23 @@ exports.buyCrown = callable(async (data, uid) => {
         const owned = u.ownedCrowns || [];
         if (owned.includes(id)) fail('failed-precondition', 'ALREADY_OWNED');
         if ((u.diamonds || 0) < c.price) fail('failed-precondition', 'INSUFFICIENT_DIAMONDS');
-        const r = applyDelta(t, uid, u, { dia: -c.price, xp: Math.floor(c.price / 100), extra: { ownedCrowns: FV.arrayUnion(id), crown: id }, title: 'Crown: ' + c.name, txType: 'spend' });
+        const r = applyDelta(t, uid, u, { dia: -c.price, xp: Math.floor(c.price / 100), extra: { ownedCrowns: FV.arrayUnion(id) }, title: 'Crown: ' + c.name, txType: 'spend' });
         return { balance: r.diamonds };
     });
 });
 
-/* মুকুট পরা (যেটা আছে সেটাই; '' দিলে খুলে ফেলা) */
+/* মুকুট পরা — কেনা থাকা মুকুটই; 'official' শুধু Developer; '' দিলে খুলে ফেলা */
 exports.equipCrown = callable(async (data, uid) => {
     const id = String(data.id || '');
     const u = await userRef(uid).get(); if (!u.exists) fail('not-found', 'NOT_FOUND');
     const d = u.data(); assertActive(d);
-    if (id && !(d.ownedCrowns || []).includes(id)) fail('permission-denied', 'PERMISSION_DENIED');
-    await userRef(uid).update({ crown: id });
-    return { ok: true };
+    const isDev = d.role === 'developer';
+    if (id === 'official'){ if (!isDev) fail('permission-denied', 'PERMISSION_DENIED'); }
+    else if (id){ if (!C.CROWNS[id] || !(d.ownedCrowns || []).includes(id)) fail('permission-denied', 'PERMISSION_DENIED'); }
+    /* খুলে ফেলা: Developer এর ক্ষেত্রে 'none' (না হলে ডিফল্ট official ফিরে আসত) */
+    const val = id || (isDev ? 'none' : '');
+    await userRef(uid).update({ crown: val });
+    return { ok: true, crown: val };
 });
 
 /* অন্য বন্ধুকে মুকুট গিফট (giftable মুকুট) */
