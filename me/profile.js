@@ -27,6 +27,7 @@ function renderMeExtras(){
     let idc = document.getElementById('idChips');
     if (!idc){ const n = document.getElementById('userName'); if (n){ idc = document.createElement('div'); idc.id = 'idChips'; idc.style.cssText = 'margin-top:4px;display:flex;gap:4px;justify-content:center;align-items:center;flex-wrap:wrap'; n.parentNode.insertBefore(idc, n.nextSibling); } }
     if (idc) idc.innerHTML = MOI.identityHTML(m);
+    const aw = document.querySelector('.avatar-wrap'); if (aw && MOI.crownAttachUser) MOI.crownAttachUser(aw, m);
     set('lvlNum', li.level); set('lvlTitle', li.title);
     set('lvlXp', MOI.fmt(li.xp) + ' / ' + MOI.fmt(li.hi) + ' XP');
     const bar = document.getElementById('lvlBar'); if (bar) bar.style.width = li.pct + '%';

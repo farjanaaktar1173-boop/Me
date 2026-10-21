@@ -185,26 +185,68 @@ function bagItems(){
     const fs = (window.MOI && MOI.frameState && MOI.frameState()) || { owned: ['basic'] };
     const items = [];
     (fs.owned || []).forEach(id => { const f = (MOI.FRAMES || []).find(x => x.id === id); if (f) items.push({ name: f.name + ' Frame', emoji: '🖼️', type: 'frame', qty: 1 }); });
-    (u.ownedCrowns || []).forEach(c => items.push({ name: c + ' Crown', emoji: '👑', type: 'crown', qty: 1 }));
     (u.badges || []).forEach(b => items.push({ name: b, emoji: '🏅', type: 'badge', qty: 1 }));
     return items;
 }
+/* ব্যাগের মুকুট: Developer হলে সবসময় official সবার আগে + কেনা সবগুলো */
+function bagCrowns(){
+    const m = (window.MOI && MOI.me()) || {};
+    const list = [];
+    if (m.role === 'developer') list.push('official');
+    (m.ownedCrowns || []).forEach(id => { if (MOI.crownById(id) && !list.includes(id)) list.push(id); });
+    return list;
+}
+let _bagSel = '';
+const _inUseCrown = () => ((window.MOI && MOI.effectiveCrown(MOI.me())) || {}).id || '';
+function bagActionHTML(){
+    if (!_bagSel) return '';
+    const c = MOI.crownById(_bagSel); if (!c) return '';
+    const inUse = _bagSel === _inUseCrown();
+    return `<div class="bag-sel-name">${_esc(c.name)}</div>` + (inUse
+        ? `<button class="bag-use-btn remove" onclick="bagUseCrown('')">Remove</button>`
+        : `<button class="bag-use-btn" onclick="bagUseCrown('${_bagSel}')">Use</button>`);
+}
 function renderBag(){
+    const m = (window.MOI && MOI.me()) || {};
     const items = bagItems();
+    const crowns = bagCrowns();
+    const inUse = _inUseCrown();
+    if (!_bagSel || !crowns.includes(_bagSel)) _bagSel = inUse || crowns[0] || '';
     const claimed = ((ls_get(dailyKey(), null) || {}).last) === (window.MOI ? new Date(Date.now() + 6 * 3600000).toISOString().slice(0, 10) : '');
+    const showCrowns = _bagTab === 'all' || _bagTab === 'crown';
     const list = items.filter(i => _bagTab === 'all' || i.type === _bagTab);
-    const grid = list.length ? list.map(i => `<div class="bag-item">
+    const photo = _esc(m.photo || window.FALLBACK_IMG || '');
+    const crownHTML = (showCrowns && crowns.length) ? `
+        <div class="bag-crown-grid">${crowns.map(id => { const c = MOI.crownById(id); return `
+            <div class="bag-crown ${id === _bagSel ? 'sel' : ''}" data-cid="${id}" onclick="bagPickCrown('${id}')">
+                <div class="mx-crown-stage" data-crown-stage="${id}"><img src="${photo}" alt=""></div>
+                <div class="bag-name">${_esc(c.name)}</div>${id === inUse ? '<span class="bag-tag">In Use</span>' : ''}
+            </div>`; }).join('')}</div>
+        <div class="bag-actionbar" id="bagActionBar">${bagActionHTML()}</div>` : '';
+    const gridHTML = list.length ? `<div class="bag-grid">${list.map(i => `<div class="bag-item">
         <div class="bag-emoji">${i.emoji}</div><div class="bag-name">${_esc(i.name)}</div>
-        <div class="bag-qty">×${i.qty}</div></div>`).join('')
-        : `<div class="empty"><i class="fa-solid fa-bag-shopping"></i><p>ব্যাগ খালি আছে — Store থেকে ফ্রেম/মুকুট কিনুন</p></div>`;
+        <div class="bag-qty">×${i.qty}</div></div>`).join('')}</div>` : '';
+    const emptyHTML = (!crownHTML && !gridHTML) ? `<div class="bag-grid"><div class="empty"><i class="fa-solid fa-bag-shopping"></i><p>ব্যাগ খালি আছে — Store থেকে ফ্রেম/মুকুট কিনুন</p></div></div>` : '';
     openPanel('MY BAG', 'fa-bag-shopping', `
         <button class="daily-btn" ${claimed ? 'disabled' : ''} onclick="claimDaily()">
             <i class="fa-solid fa-gift"></i> ${claimed ? 'আজকের Reward নেওয়া হয়েছে' : 'Daily Reward নিন (+25 💎)'}</button>
         <div class="seg">
             ${['all','frame','crown','badge'].map(t => `<button class="${_bagTab === t ? 'active' : ''}" onclick="bagTab('${t}')">${t === 'all' ? 'All' : t === 'frame' ? 'Frames' : t === 'crown' ? 'Crowns' : 'Badges'}</button>`).join('')}
         </div>
-        <div class="bag-grid">${grid}</div>`);
+        ${crownHTML}${gridHTML}${emptyHTML}`);
+    setTimeout(() => { if (window.MOI && MOI.mountCrownPreviews) MOI.mountCrownPreviews(); }, 0);
 }
+window.bagPickCrown = (id) => {
+    _bagSel = id;
+    document.querySelectorAll('.bag-crown').forEach(el => el.classList.toggle('sel', el.dataset.cid === id));
+    const bar = document.getElementById('bagActionBar'); if (bar) bar.innerHTML = bagActionHTML();
+};
+window.bagUseCrown = async (id) => {
+    const btn = document.querySelector('.bag-use-btn'); if (btn) btn.disabled = true;
+    const ok = await MOI.useCrown(id);
+    if (ok) toastMsg(id ? 'মুকুট পরা হয়েছে 👑' : 'মুকুট খুলে ফেলা হয়েছে', 'fa-crown');
+    renderBag();
+};
 window.bagTab = (t) => { _bagTab = t; renderBag(); };
 
 window.claimDaily = async () => {
