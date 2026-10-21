@@ -8,7 +8,7 @@ const FB = () => window.MOIFB;
 let me = null, found = null, tab = null;
 
 const BADGES = ['official_host','top_gifter','verified','early_bird','moderator'];
-const CROWNS = ['bronze','silver','gold','diamond','royal'];
+const CROWNS = ['crown_gold','royal_red','royal_green','royal_purple','lion_vip','dragon_vip','crystal_shield','ocean_pearl'];
 const TABS = {
     developer:   [['users','ইউজার'],['money','ডায়মন্ড'],['reports','রিপোর্ট'],['tx','লেনদেন']],
     superadmin:  [['users','ইউজার'],['reports','রিপোর্ট']],
