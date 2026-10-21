@@ -27,6 +27,18 @@ function renderMeExtras(){
     let idc = document.getElementById('idChips');
     if (!idc){ const n = document.getElementById('userName'); if (n){ idc = document.createElement('div'); idc.id = 'idChips'; idc.style.cssText = 'margin-top:4px;display:flex;gap:4px;justify-content:center;align-items:center;flex-wrap:wrap'; n.parentNode.insertBefore(idc, n.nextSibling); } }
     if (idc) idc.innerHTML = MOI.identityHTML(m);
+    /* রোল অনুযায়ী প্যানেল বাটন (Developer / Admin / Seller) — Account মেনুর উপরে */
+    const panelPath = window.MOIAuth && MOIAuth.panelFor(m.role);
+    const acct = document.querySelector('.menu-section .menu-list');
+    if (panelPath && acct && !document.getElementById('panelMenuItem')){
+        const label = m.role === 'developer' ? 'Developer Panel' : m.role === 'superadmin' ? 'Admin Panel' : 'Seller Panel';
+        const desc = m.role === 'distributor' ? 'Sell diamonds to users' : 'Users, diamonds, roles & reports';
+        const it = document.createElement('div');
+        it.className = 'menu-item'; it.id = 'panelMenuItem';
+        it.onclick = () => { location.href = '../' + panelPath; };
+        it.innerHTML = '<div class="menu-icon wallet"><i class="fa-solid fa-shield-halved"></i></div><div class="menu-info"><div class="menu-name">' + label + '</div><div class="menu-desc">' + desc + '</div></div><div class="menu-arrow"><i class="fa-solid fa-chevron-right"></i></div>';
+        acct.insertBefore(it, acct.firstChild);
+    }
     const aw = document.querySelector('.avatar-wrap'); if (aw && MOI.crownAttachUser) MOI.crownAttachUser(aw, m);
     set('lvlNum', li.level); set('lvlTitle', li.title);
     set('lvlXp', MOI.fmt(li.xp) + ' / ' + MOI.fmt(li.hi) + ' XP');
