@@ -33,8 +33,7 @@ function redirectFor(p){
     showRedirect(true);
     $('redirectWho').textContent = 'স্বাগতম, ' + (p.name || 'User') + '! নিয়ে যাওয়া হচ্ছে…';
     $('redirectCounter').textContent = '';
-    const panel = MOIAuth.panelFor(p.role);
-    const url = panel ? '../' + panel : '../home/index.html';
+    const url = '../home/index.html';   /* প্যানেল এখন Me পেজের বাটনে */
     setTimeout(() => location.replace(url), 700);
 }
 
