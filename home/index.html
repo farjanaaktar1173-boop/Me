@@ -17,8 +17,6 @@
 </head>
 <body>
 
-<div class="demo-flag"><i class="fa-solid fa-flask"></i> DEMO MODE</div>
-
 <div class="app-container">
 
   <div class="top-bar">
@@ -44,83 +42,31 @@
     </div>
   </div>
 
-  <div class="banner-container">
-    <div class="room-banner" id="roomBanner" role="link" tabindex="0">
-      <div class="room-avatar-wrap">
-        <div class="room-avatar-glow"></div>
-        <img class="room-avatar" id="roomAvatar" src="" alt="room">
-        <span class="room-live-badge" id="roomLiveBadge" style="display:none">LIVE</span>
-      </div>
-      <div class="room-banner-info">
-        <div class="room-name" id="bannerTitle">Loading…</div>
-        <div class="room-meta">
-          <span class="room-country" id="bannerCountry"><i class="fa-solid fa-globe"></i> <span>Country</span></span>
-          <span class="room-level" id="roomLevel">L.0</span>
-          <span class="room-uid-badge" id="bannerUid"><i class="fa-solid fa-hashtag"></i> ---</span>
-        </div>
-      </div>
-      <button class="room-action-btn" id="mineBtn">
-        <i class="fa-solid fa-plus"></i>
-        <span>CREATE</span>
-      </button>
-    </div>
+  <!-- লুকানো ব্যানার: Create-ক্লিক ও রুম তৈরির কোড (modal.js / banner.js) এর জন্য রাখা; দেখা যায় না -->
+  <div class="room-banner" id="roomBanner" style="display:none">
+    <img id="roomAvatar" src="" alt=""><span id="roomLiveBadge"></span>
+    <span id="bannerTitle"></span><span id="bannerCountry"></span><span id="roomLevel"></span><span id="bannerUid"></span>
+    <button id="mineBtn" type="button"></button>
   </div>
 
+  <section class="sec">
+    <div class="sec-head"><h2>আমার রুম</h2></div>
+    <div class="mine-row" id="mineRow"></div>
+  </section>
 
-  <div class="quick-row" id="quickRow">
-    <button class="qa" onclick="MOI.openCheckin()"><span class="qa-ic qa-a"><i class="fa-solid fa-calendar-check"></i><em class="qa-dot" id="dotCheckin"></em></span><span>Check-in</span></button>
-    <button class="qa" onclick="MOI.openSpin()"><span class="qa-ic qa-b"><i class="fa-solid fa-dharmachakra"></i><em class="qa-dot" id="dotSpin"></em></span><span>Lucky Spin</span></button>
-    <button class="qa" onclick="MOI.openLeaderboard()"><span class="qa-ic qa-c"><i class="fa-solid fa-ranking-star"></i></span><span>Ranking</span></button>
-    <button class="qa" onclick="MOI.openStore()"><span class="qa-ic qa-d"><i class="fa-solid fa-store"></i></span><span>Store</span></button>
-    <button class="qa" onclick="MOI.openBadges()"><span class="qa-ic qa-e"><i class="fa-solid fa-medal"></i></span><span>Badges</span></button>
-  </div>
-
-  <div class="section-header">
-    <div class="section-top-row">
-      <span class="section-title"><span class="fire">🔥</span> Hot Rooms</span>
-      <button class="action-chip" id="followingBtn"><i class="fa-solid fa-star"></i> Following</button>
-    </div>
-    <div class="live-stats" id="liveStats"></div>
+  <section class="sec">
+    <div class="sec-head"><h2>সুপারিশকৃত রুম</h2><span class="live-stats" id="liveStats"></span></div>
     <div class="cat-row" id="catRow">
-      <button class="cat on" data-cat="all">All</button>
-      <button class="cat" data-cat="music"><i class="fa-solid fa-music"></i> Music</button>
-      <button class="cat" data-cat="chat"><i class="fa-solid fa-comments"></i> Chat</button>
-      <button class="cat" data-cat="party"><i class="fa-solid fa-champagne-glasses"></i> Party</button>
-      <button class="cat" data-cat="new"><i class="fa-solid fa-sparkles"></i> New</button>
+      <button class="cat on" data-cat="trending">🔥 ট্রেন্ডিং</button>
+      <button class="cat" data-cat="nearby">📍 নিকটবর্তী</button>
+      <button class="cat" data-cat="chat">💬 আড্ডা</button>
+      <button class="cat" data-cat="music">🎵 গান</button>
+      <button class="cat" data-cat="game">🎮 গেম</button>
+      <button class="cat" data-cat="party">🎉 পার্টি</button>
+      <button class="cat" data-cat="new">✨ নতুন</button>
     </div>
-    <div class="country-row">
-      <div class="country-selector-wrap">
-        <span class="flag-preview" id="flagPreview">🌍</span>
-        <select id="countryFilter">
-          <option value="all">All Countries</option>
-          <option value="Bangladesh">Bangladesh</option>
-          <option value="India">India</option>
-          <option value="Pakistan">Pakistan</option>
-          <option value="Nepal">Nepal</option>
-          <option value="Sri Lanka">Sri Lanka</option>
-          <option value="UAE">UAE</option>
-          <option value="Saudi Arabia">Saudi Arabia</option>
-          <option value="Malaysia">Malaysia</option>
-          <option value="Singapore">Singapore</option>
-          <option value="UK">UK</option>
-          <option value="USA">USA</option>
-          <option value="Canada">Canada</option>
-          <option value="Australia">Australia</option>
-          <option value="Japan">Japan</option>
-          <option value="South Korea">South Korea</option>
-          <option value="China">China</option>
-          <option value="Russia">Russia</option>
-          <option value="France">France</option>
-          <option value="Germany">Germany</option>
-          <option value="Italy">Italy</option>
-        </select>
-        <i class="fa-solid fa-chevron-down chev"></i>
-      </div>
-      <button class="clear-filter-btn" id="clearFilterBtn" title="Clear filter"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-  </div>
-
-  <div class="grid-container" id="hotGrid"></div>
+    <div class="feed" id="hotGrid"></div>
+  </section>
 
 </div>
 
