@@ -187,38 +187,3 @@ body{font-family:'Figtree','Hind Siliguri',sans-serif;background:radial-gradient
 
 /* ভূমিকা অনুযায়ী প্যানেল শর্টকাট */
 .panel-link{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 8px);z-index:60;display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;background:linear-gradient(135deg,var(--c1),var(--c2));color:var(--on,#1a1020);font:800 12px/1 'Figtree',sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.45)}
-
-/* ═══ নতুন Home: আমার রুম + সুপারিশকৃত রুম ═══ */
-.sec{padding:6px 16px 4px}
-.sec-head{display:flex;align-items:center;justify-content:space-between;margin:14px 0 10px}
-.sec-head h2{font-size:19px;font-weight:800;color:var(--tx);letter-spacing:.01em}
-.live-stats{font-size:12px;color:var(--mute3);font-weight:600}
-.mine-row{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none;margin:0 -16px;padding-left:16px;padding-right:16px}
-.mine-row::-webkit-scrollbar,.cat-row::-webkit-scrollbar{display:none}
-.mine-tile{flex:none;width:98px;text-align:left;background:none;border:0;color:var(--tx);cursor:pointer;font-family:inherit}
-.mine-img{position:relative;display:block;width:98px;height:98px;border-radius:20px;overflow:hidden;background:var(--bg1);border:1px solid rgba(255,255,255,.1)}
-.mine-img>img{width:100%;height:100%;object-fit:cover;display:block}
-.mine-img.create{display:grid;place-items:center;font-size:26px;color:var(--c3);border:1.5px dashed rgba(var(--c2-rgb),.6);background:rgba(var(--c2-rgb),.08)}
-.mine-own{position:absolute;left:6px;bottom:6px;width:26px;height:26px;border-radius:50%;border:2px solid #fff;overflow:hidden;background:var(--bg2)}
-.mine-own img{width:100%;height:100%;object-fit:cover;display:block}
-.mine-cnt{position:absolute;right:6px;bottom:6px;padding:3px 8px;border-radius:99px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:#fff;font-size:11px;font-weight:700}
-.mine-badge{position:absolute;left:6px;top:6px;padding:2px 8px;border-radius:99px;background:var(--gold-grad);color:#111;font-size:10px;font-weight:800}
-.mine-name{display:block;margin-top:7px;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cat-row{display:flex;gap:9px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none}
-.cat{flex:none;padding:9px 16px;border-radius:99px;font:600 13.5px 'Figtree','Hind Siliguri',sans-serif;color:var(--tx);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);cursor:pointer;white-space:nowrap}
-.cat.on{background:var(--gold-grad);color:#111;border-color:transparent;font-weight:800}
-.feed{display:flex;flex-direction:column;gap:12px;padding-bottom:6px}
-.feed-card{padding:14px 15px;border-radius:20px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.1);cursor:pointer;transition:transform .15s}
-.feed-card:active{transform:scale(.985)}
-.fc-head{display:flex;align-items:center;gap:10px}
-.fc-logo{width:36px;height:36px;border-radius:11px;object-fit:cover;flex:none}
-.fc-name{flex:1;min-width:0;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fc-count{flex:none;padding:5px 11px;border-radius:99px;background:rgba(255,255,255,.08);font-size:13px;font-weight:700}
-.fc-topic{margin:11px 0 12px;font-size:17px;line-height:1.4;font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.fc-people{display:flex;align-items:center;min-height:40px}
-.fc-people img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--bg1);margin-right:-8px;background:var(--bg2)}
-.fc-people .more{margin-left:14px;font-size:13px;font-weight:700;color:var(--mute3)}
-.empty-people{font-size:12.5px;color:var(--mute3)}
-.fc-foot{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
-.fc-chip{font-size:12px;font-weight:600;padding:4px 10px;border-radius:8px;background:rgba(255,255,255,.07);color:var(--mute3)}
-.fc-chip.lv{color:var(--c3)}.fc-chip.id{font-family:'Bricolage Grotesque','Hind Siliguri',sans-serif}
