@@ -351,5 +351,15 @@ console.log('[MOI] sync-routes.js loaded');
             ref.on('value', cb, warn('presence')); return () => ref.off('value', cb);
         }
     });
+
+    /* ───────── ৯.৫) কোন রুমে কে কে আছে (হোমের কার্ডে ছবি দেখানোর জন্য) — { roomId: [uid, uid, ...] } ───────── */
+    S.addRoute({
+        match: k => k === 'moi_room_users' ? {} : null,
+        sub(key, ctx, push){
+            const ref = rtdb.ref(LIVE + '/roomPresence');
+            const cb = snap => { const v = snap.val() || {}; const c = {}; Object.keys(v).forEach(r => { c[r] = Object.keys(v[r] || {}).slice(0, 12); }); push(c); };
+            ref.on('value', cb, warn('presence users')); return () => ref.off('value', cb);
+        }
+    });
     S.roomCount = id => (S.get('moi_room_counts', {}) || {})[id] || 0;
 })();
