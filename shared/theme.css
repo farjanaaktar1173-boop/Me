@@ -1,5 +1,5 @@
-/* shared/theme.css — MOI ডিজাইন টোকেন (৪টি থিম) + সবার জন্য সাধারণ পলিশ */
-:root,:root[data-theme="golden"]{--mute:#a89fbd;--mute2:#7d7498;--mute3:#c3bbd8;--tx:#f4eefb;
+/* shared/theme.css — MOI ডিজাইন টোকেন (৫টি থিম: light=Daylight (শুধু Home সাদা, বাকি পেজ গাঢ় Golden রঙে), golden, lagoon, orchid, royal) + সবার জন্য সাধারণ পলিশ */
+:root,:root[data-theme="golden"],:root[data-theme="light"]{--mute:#a89fbd;--mute2:#7d7498;--mute3:#c3bbd8;--tx:#f4eefb;
   --c1:#ff5f7e;--c1-rgb:255,95,126;--c2:#ffb25a;--c2-rgb:255,178,90;--c3:#ffe3b8;--c3-rgb:255,227,184;
   --c1s:#ffc2cf;--c1s-rgb:255,194,207;--c2d:#c97a2b;--c2d-rgb:201,122,43;
   --bg0:#0f0818;--bg0-rgb:15,8,24;--bg1:#170d2a;--bg1-rgb:23,13,42;--bg2:#21163a;--bg2-rgb:33,22,58;--bg3:#2b1d4b;--bg3-rgb:43,29,75;

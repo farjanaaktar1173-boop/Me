@@ -1,6 +1,7 @@
 /* shared/theme.js — থিম সিস্টেম (সব পেজে সবার আগে লোড হয়) */
 (function(){
     const THEMES = {
+        light:  { name:'Daylight',    desc:'সাদা ব্যাকগ্রাউন্ড, সোনালি ও টিল (ডিফল্ট)', sw:['#e8a93c','#3fd6c1','#ffffff'], meta:'#f3f4f9' },
         golden: { name:'Golden Hour', desc:'কোরাল ও অ্যাপ্রিকট, প্লাম বেস',   sw:['#ff5f7e','#ffb25a','#170d2a'], meta:'#0f0818' },
         lagoon: { name:'Lagoon',      desc:'মিন্ট ও আকাশি, গভীর সবুজ',       sw:['#20e3b2','#00d9ff','#061c21'], meta:'#031215' },
         orchid: { name:'Orchid',      desc:'ভায়োলেট ও পিংক, নাইট ইঙ্ক',       sw:['#b45cff','#ff6bd6','#150a2a'], meta:'#0d0618' },
@@ -8,13 +9,14 @@
     };
     function current(){
         try { const t = localStorage.getItem('moi_theme'); if (t && THEMES[t]) return t; } catch(e){}
-        return 'golden';
+        return 'light';      /* প্রথমবার যে ঢোকে সে সাদা (Daylight) থিম দেখবে; পরে Me পেজ থেকে বদলাতে পারবে */
     }
     function apply(name){
         document.documentElement.setAttribute('data-theme', name);
         let m = document.querySelector('meta[name="theme-color"]');
         if (!m){ m = document.createElement('meta'); m.name = 'theme-color'; (document.head || document.documentElement).appendChild(m); }
-        m.content = THEMES[name].meta;
+        /* Daylight থিম এখন শুধু Home পেজে সাদা; বাকি পেজ গাঢ় — তাই স্ট্যাটাস বারও সেভাবে */
+        m.content = (name === 'light' && !/\/home\//.test(location.pathname)) ? '#0f0818' : THEMES[name].meta;
     }
     function set(name){
         if (!THEMES[name]) return;
