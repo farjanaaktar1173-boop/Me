@@ -1,4 +1,4 @@
-/* home/home.js — Home পেজের মূল কাজ (Init, User, Chat) */
+/* home/home.js — Home পেজের মূল কাজ (Init, User, Chat, Nav, ট্যাব) */
 
 console.log('[MOI HOME] LIVE MODE (Firebase)');
 
@@ -14,14 +14,26 @@ window.LINKS = {
 window.user = { uid:'', name:'User', photo:'', email:'', country:'', voice:'', moiId:'', myRoomUid:'', diamonds:0, role:'user' };
 window.userReady = false;
 
+/* ═══ আইকন বসানো (home/icons.js থেকে) ═══ */
+function setupIcons(){
+    const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+    set('logoIc', HIC.logo);
+    set('diaIc', HIC.gem);
+    set('searchToggle', HIC.search);
+    set('bellBtn', HIC.bell);
+    set('segRooms', HIC.live + 'লাইভ রুম');
+    set('segExplore', HIC.compass + 'আবিষ্কার');
+    set('btnShuffle', HIC.shuffle);
+    set('navRoom', HIC.room + '<span>রুম</span>');
+    set('navChat', HIC.chat + '<em id="chatBadge">0</em><span>মেসেজ</span>');
+    set('navMe', HIC.user + '<span>আমি</span>');
+}
+setupIcons();
+
 /* ═══ ইউজার সেট করা (Firebase প্রোফাইল থেকে) ═══ */
 function initUser(){
     const p = MOIAuth.profile;
-    if (!p || !MOIAuth.user){
-        document.getElementById('userNameDisplay').textContent = 'Not Logged In';
-        document.getElementById('userDisplayId').textContent = 'Please sign in';
-        return false;
-    }
+    if (!p || !MOIAuth.user) return false;
     Object.assign(window.user, {
         uid: MOIAuth.user.uid, name: p.name || 'User', photo: p.photo || '', email: '',
         country: p.country || '', voice: p.voice || '', moiId: p.moiId || '',
@@ -31,42 +43,60 @@ function initUser(){
     return true;
 }
 
-/* ═══ ইউজার রেন্ডার ═══ */
+/* ═══ ইউজার রেন্ডার (উপরের গোল প্রোফাইল ছবি) ═══ */
 function renderUser(){
-    document.getElementById('userNameDisplay').textContent = window.user.name || 'User';
-    document.getElementById('userDisplayId').textContent = 'ID: ' + (window.user.moiId || (window.user.uid ? window.user.uid.slice(0,8) : '---'));
-    if (window.user.photo) document.getElementById('userAvatar').src = window.user.photo;
+    const ring = document.getElementById('btnProfile');
+    const img = document.getElementById('userAvatar');
+    const init = document.getElementById('meInit');
+    if (init) init.textContent = ((window.user.name || 'U').trim()[0] || 'U').toUpperCase();
+    if (img && window.user.photo){
+        img.src = window.user.photo;
+        if (ring) ring.classList.add('has');
+    } else if (ring) ring.classList.remove('has');
 }
 
-/* ═══ নতুন ফিচার বাঁধা: bell, level, diamonds, quick-action dots ═══ */
+/* ═══ বেল, ডায়মন্ড, কুইক-অ্যাকশন ডট ═══ */
 function refreshHomeStats(){
     if (!window.MOI || !MOI.me()) return;
-    const li = MOI.levelInfo(), m = MOI.me();
-    const lc = document.getElementById('lvlChip'); if (lc) lc.textContent = 'Lv ' + li.level;
+    const m = MOI.me();
     const dv = document.getElementById('diaVal'); if (dv) dv.textContent = MOI.fmt(m.diamonds || 0);
-    const d1 = document.getElementById('dotCheckin'); if (d1) d1.style.display = MOI.canCheckin() ? 'block' : 'none';
-    const d2 = document.getElementById('dotSpin'); if (d2) d2.style.display = MOI.canSpin() ? 'block' : 'none';
+    refreshQuickDots();
     MOI.refreshBells();
 }
 function initFeatures(){
+    initQuickActions();
     if (!window.MOI) return;
     MOI.bindBell(document.getElementById('bellBtn'));
     const pill = document.getElementById('diaPill');
     if (pill) pill.addEventListener('click', () => { location.href = window.LINKS.me + '#wallet'; });
     ['moi:diamonds','moi:xp','moi:followers'].forEach(ev => window.addEventListener(ev, refreshHomeStats));
-    const sheetOv = document.getElementById('mxOverlay');
     document.addEventListener('click', () => setTimeout(refreshHomeStats, 400));
     refreshHomeStats();
 }
 
-/* ═══ Nav Active State ঠিক করা ═══ */
+/* ═══ Nav Active State ═══ */
 function setNavActive(which){
     const room = document.getElementById('navRoom');
     const chat = document.getElementById('navChat');
     const me   = document.getElementById('navMe');
-    if (room) room.classList.toggle('active', which === 'room');
-    if (chat) chat.classList.toggle('active', which === 'chat');
-    if (me)   me.classList.toggle('active', which === 'me');
+    if (room) room.classList.toggle('on', which === 'room');
+    if (chat) chat.classList.toggle('on', which === 'chat');
+    if (me)   me.classList.toggle('on', which === 'me');
+}
+
+/* ═══ উপরের ট্যাব: লাইভ রুম / আবিষ্কার ═══ */
+function showView(which){
+    document.getElementById('v-home').hidden = which !== 'rooms';
+    document.getElementById('v-explore').hidden = which !== 'explore';
+    document.querySelectorAll('#seg button').forEach(b => b.classList.toggle('on', b.dataset.t === which));
+}
+function initTabs(){
+    document.getElementById('seg').addEventListener('click', (e) => {
+        const b = e.target.closest('button'); if (!b) return;
+        showView(b.dataset.t);
+        window.scrollTo({ top:0 });
+    });
+    document.getElementById('btnProfile').addEventListener('click', () => { location.href = window.LINKS.me; });
 }
 
 /* ═══ Chat ═══ */
@@ -108,6 +138,7 @@ function initNav(){
     document.getElementById('navRoom').addEventListener('click', () => {
         if (chatOpen){ closeChat(); return; }
         setNavActive('room');
+        showView('rooms');
         window.scrollTo({ top:0, behavior:'smooth' });
     });
 
@@ -130,11 +161,13 @@ function initNav(){
         if (!u){ location.replace(URLS.login); return; }
 
         const ok = initUser();
-        if (!ok){ renderBannerEmpty(); return; }
+        if (!ok){ return; }
 
         renderUser();
-        loadMyRoom();
+        initTabs();
+        initMyRail();
         initRoomsUI();
+        renderMyRail();
         initModal();
         initNav();
         initFeatures();
@@ -142,18 +175,18 @@ function initNav(){
 
         setNavActive('room');
 
-        /* লাইভ আপডেট: রুম লিস্ট, প্রোফাইল, শ্রোতার সংখ্যা */
+        /* লাইভ আপডেট: রুম লিস্ট, প্রোফাইল, শ্রোতার সংখ্যা, রুমে কে কে আছে */
         window.addEventListener('moi:sync', (e) => {
             const k = e.detail && e.detail.key;
-            if (k === 'moi_demo_rooms' || k === 'moi_room_counts') renderHotRooms();
-            if (k === 'moi_demo_users'){ initUser(); renderUser(); loadMyRoom(); refreshHomeStats(); }
+            if (k === 'moi_demo_rooms' || k === 'moi_room_counts' || k === 'moi_room_users'){ renderHotRooms(); renderMyRail(); }
+            if (k === 'moi_demo_users'){ initUser(); renderUser(); renderHotRooms(); renderMyRail(); refreshHomeStats(); }
         });
         MOISync.watch('moi_room_counts');
+        MOISync.watch('moi_room_users');
 
         console.log('%c[MOI HOME] ✅ ready — ' + window.user.name + ' (' + window.user.moiId + ')', 'color:#20e3b2;font-weight:800');
     } catch(err){
         console.error('[INIT] fatal:', err);
-        renderBannerEmpty();
     }
 })();
 

@@ -1,4 +1,4 @@
-/* home/modal.js — Create Room মডাল + Cropper */
+/* home/modal.js — নতুন রুম তৈরির মডাল + ছবি কাটা (Cropper) */
 
 console.log('[MOI] modal.js loaded');
 
@@ -45,9 +45,8 @@ function initModal(){
         imageInput.value = '';
     });
 
-    /* ═══ Mine button ═══ */
-    async function handleMineClick(e){
-        if (e) e.stopPropagation();
+    /* ═══ নতুন রুম তৈরির মডাল খোলা (আমার রুম রেলের + বক্স থেকে ডাকা হয়) ═══ */
+    async function openCreateRoom(){
         if (!window.userReady){ alert('ইউজার লোড হচ্ছে...'); return; }
         if (window.user.myRoomUid){
             location.href = window.LINKS.room + '?room=' + encodeURIComponent(window.user.myRoomUid);
@@ -63,12 +62,7 @@ function initModal(){
         if (plus) plus.style.display = '';
         document.getElementById('roomModal').classList.add('show');
     }
-
-    document.getElementById('roomBanner').addEventListener('click', (e) => {
-        if (e.target.closest('#mineBtn')) return;
-        handleMineClick(e);
-    });
-    document.getElementById('mineBtn').addEventListener('click', handleMineClick);
+    window.openCreateRoom = openCreateRoom;
 
     document.getElementById('modalCloseBtn').addEventListener('click', () => {
         document.getElementById('roomModal').classList.remove('show');
